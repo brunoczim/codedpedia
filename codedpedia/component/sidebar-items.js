@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["asset","block","inline","page","section"],"trait":["Component","ComponentKind"]};

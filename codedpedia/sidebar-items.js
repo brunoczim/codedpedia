@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["static_site_main"],"macro":["Coproduct","HArray","harray","hiter","hvec"],"mod":["component","hseq","location","render","site"]};

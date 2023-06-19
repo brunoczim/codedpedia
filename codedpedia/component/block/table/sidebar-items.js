@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["CaptionedTable","Cell","CellAttrs","CellComponent","Row","RowComponent","Table"]};

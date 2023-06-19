@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This tool allows you to generate static sites in encyclopedia-like format, using Rust code. The tool can be resumed in a few items:"><title>codedpedia - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="codedpedia" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../codedpedia/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../codedpedia/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate codedpedia</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#functions">Functions</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">codedpedia</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/codedpedia/lib.rs.html#1-228">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This tool allows you to generate static sites in encyclopedia-like format,
+using Rust code. The tool can be resumed in a few items:</p>
+<ul>
+<li>Components;</li>
+<li>Component kinds;</li>
+<li>Rendering formats;</li>
+<li>Sites.</li>
+</ul>
+<p>Components implement the <a href="component/trait.Component.html" title="trait codedpedia::component::Component"><code>Component</code></a> trait and have
+a <a href="component/trait.ComponentKind.html" title="trait codedpedia::component::ComponentKind"><code>ComponentKind</code></a> associated with it that serves
+for the purpose of typing components. Paideia’s builtin component kinds are:</p>
+<ul>
+<li><a href="component/inline/struct.InlineComponent.html" title="struct codedpedia::component::inline::InlineComponent"><code>InlineComponent</code></a> - components
+inlined in text;</li>
+<li><a href="component/block/struct.BlockComponent.html" title="struct codedpedia::component::block::BlockComponent"><code>BlockComponent</code></a> - components with
+blocks of their own;</li>
+<li><a href="component/block/table/struct.CellComponent.html" title="struct codedpedia::component::block::table::CellComponent"><code>table::CellComponent</code></a> - cells
+of a table;</li>
+<li><a href="component/block/table/struct.RowComponent.html" title="struct codedpedia::component::block::table::RowComponent"><code>table::RowComponent</code></a> - rows of a
+table;</li>
+<li><a href="component/section/struct.SectionComponent.html" title="struct codedpedia::component::section::SectionComponent"><code>SectionComponent</code></a> - sections of
+an article/page;</li>
+<li><a href="component/asset/struct.AssetComponent.html" title="struct codedpedia::component::asset::AssetComponent"><code>AssetComponent</code></a> - asset of an
+article/page;</li>
+<li><a href="component/page/struct.PageComponent.html" title="struct codedpedia::component::page::PageComponent"><code>PageComponent</code></a> - the whole
+article/page.</li>
+</ul>
+<p>Rendering formats are a proxy to Rust’s <code>fmt</code> which allows specific
+formatting e.g. in a specific context, such as in a nested list. More
+important than that is that they also are used to define what kind of output
+the rendering will produce. Builtin rendering formats are:</p>
+<ul>
+<li><a href="render/html/struct.Html.html" title="struct codedpedia::render::html::Html">HTML</a>;</li>
+<li><a href="render/markdown/struct.Markdown.html" title="struct codedpedia::render::markdown::Markdown">Markdown</a>;</li>
+<li><a href="render/text/struct.Text.html" title="struct codedpedia::render::text::Text">Plaintext</a>.</li>
+</ul>
+<p>Components can implement a trait named <a href="render/trait.Render.html" title="trait codedpedia::render::Render"><code>Render&lt;W&gt;</code></a> where
+<code>W</code> is a rendering format. For instance, if a component wants to render
+HTML, it must implement <code>Render&lt;Html&gt;</code>.</p>
+<p>Finally, a <a href="site/struct.Site.html" title="struct codedpedia::site::Site"><code>Site</code></a> is a collection of pages structured in terms
+of in-memory directories. The build process consists of generating pages
+into actual directories, as well copying resources. Look at the function
+<a href="fn.static_site_main.html" title="fn codedpedia::static_site_main"><code>static_site_main</code></a>. No JavaScript dependency required for the build
+output.</p>
+<h2 id="example"><a href="#example">Example</a></h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>codedpedia::{
+    component::{
+        asset::{AssetComponent, Stylesheet},
+        block::{list::UnorderedList, text::Paragraph, InlineBlock},
+        inline::text::Link,
+        page::{Page, PageComponent},
+        section::Section,
+    },
+    harray,
+    location::{Id, InternalPath, Location},
+    render::{DynFullComponent, FullRender, Html, Render},
+    site::{Entry, Site},
+    static_site_main,
+};
+
+<span class="kw">fn </span>default_assets(
+) -&gt; <span class="kw">impl </span>Render&lt;Html, Kind = AssetComponent&gt; + Send + Sync + <span class="lifetime">&#39;static </span>{
+    [Stylesheet { location: Location::internal(<span class="string">&quot;styles/main.css&quot;</span>) }]
+}
+
+<span class="kw">fn </span>index() -&gt; <span class="kw">impl </span>FullRender&lt;Kind = PageComponent&gt; + Send + Sync + <span class="lifetime">&#39;static
+</span>{
+    Page {
+        title: String::from(<span class="string">&quot;Simple Pedia&quot;</span>),
+        assets: default_assets(),
+        body: <span class="macro">harray!</span>[
+            Paragraph(
+                <span class="string">&quot;This is the initial page of the simple pedia. You can \
+                 dive down into the following:&quot;
+            </span>),
+            UnorderedList(<span class="macro">harray!</span>[
+                InlineBlock(Link {
+                    location: Location::internal(<span class="string">&quot;foo&quot;</span>),
+                    target: <span class="string">&quot;Foo stuff&quot;</span>,
+                }),
+                InlineBlock(Link {
+                    location: Location::internal(<span class="string">&quot;bar&quot;</span>),
+                    target: <span class="string">&quot;Bar stiff&quot;</span>,
+                }),
+            ]),
+        ],
+        children: <span class="macro">harray!</span>[
+            Section {
+                title: <span class="string">&quot;Random Section&quot;</span>,
+                id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;random&quot;</span>).unwrap()),
+                body: Paragraph(<span class="string">&quot;This is a random paragraph.&quot;</span>),
+                children: <span class="macro">harray!</span>[
+                    Section {
+                        title: <span class="string">&quot;Randomly First&quot;</span>,
+                        id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;random-first&quot;</span>).unwrap()),
+                        body: Paragraph(
+                            <span class="string">&quot;This the first (really?) random paragraph.&quot;
+                        </span>),
+                        children: <span class="macro">harray!</span>[],
+                    },
+                    Section {
+                        title: <span class="string">&quot;Randomly Second&quot;</span>,
+                        id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;random-second&quot;</span>).unwrap()),
+                        body: Paragraph(
+                            <span class="string">&quot;This the second (really??) random paragraph.&quot;
+                        </span>),
+                        children: <span class="macro">harray!</span>[],
+                    }
+                ],
+            },
+            Section {
+                title: <span class="string">&quot;Weird Title&quot;</span>,
+                id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;weird&quot;</span>).unwrap()),
+                body: Paragraph(<span class="string">&quot;Weird paragraph as an example&quot;</span>),
+                children: <span class="macro">harray!</span>[],
+            }
+        ],
+    }
+}
+
+<span class="kw">fn </span>foo_page(
+) -&gt; <span class="kw">impl </span>FullRender&lt;Kind = PageComponent&gt; + Send + Sync + <span class="lifetime">&#39;static </span>{
+    Page {
+        title: String::from(<span class="string">&quot;Foo&quot;</span>),
+        assets: default_assets(),
+        body: <span class="macro">harray!</span>[Paragraph(<span class="string">&quot;Foo is a metavariable.&quot;</span>),],
+        children: <span class="macro">harray!</span>[],
+    }
+}
+
+<span class="kw">fn </span>bar_page(
+) -&gt; <span class="kw">impl </span>FullRender&lt;Kind = PageComponent&gt; + Send + Sync + <span class="lifetime">&#39;static </span>{
+    Page {
+        title: String::from(<span class="string">&quot;Bar&quot;</span>),
+        assets: default_assets(),
+        body: <span class="macro">harray!</span>[Paragraph(<span class="macro">harray!</span>[
+            <span class="string">&quot;Bar is a metavariable. &quot;</span>,
+            Link { location: Location::internal(<span class="string">&quot;bar/baz&quot;</span>), target: <span class="string">&quot;Baz&quot; </span>},
+            <span class="string">&quot; is also a metavariable.&quot;
+        </span>])],
+        children: <span class="macro">harray!</span>[],
+    }
+}
+
+<span class="kw">fn </span>baz_page(
+) -&gt; <span class="kw">impl </span>FullRender&lt;Kind = PageComponent&gt; + Send + Sync + <span class="lifetime">&#39;static </span>{
+    Page {
+        title: String::from(<span class="string">&quot;Baz&quot;</span>),
+        assets: default_assets(),
+        body: <span class="macro">harray!</span>[Paragraph(<span class="macro">harray!</span>[
+            <span class="string">&quot;Baz is a metavariable, similar to &quot;</span>,
+            Link { location: Location::internal(<span class="string">&quot;bar&quot;</span>), target: <span class="string">&quot;Bar&quot; </span>},
+            <span class="string">&quot;.&quot;
+        </span>])],
+        children: <span class="macro">harray!</span>[],
+    }
+}
+
+<span class="kw">fn </span>simple_pedia_site() -&gt; Site&lt;DynFullComponent&lt;<span class="lifetime">&#39;static</span>, PageComponent&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>site = Site::default();
+    site.root.insert_path(
+        <span class="kw-2">&amp;</span>InternalPath::parse(<span class="string">&quot;index.html&quot;</span>).unwrap(),
+        Entry::Page(index().into_dyn()),
+    );
+    site.root.insert_path(
+        <span class="kw-2">&amp;</span>InternalPath::parse(<span class="string">&quot;foo/index.html&quot;</span>).unwrap(),
+        Entry::Page(foo_page().into_dyn()),
+    );
+    site.root.insert_path(
+        <span class="kw-2">&amp;</span>InternalPath::parse(<span class="string">&quot;bar/index.html&quot;</span>).unwrap(),
+        Entry::Page(bar_page().into_dyn()),
+    );
+    site.root.insert_path(
+        <span class="kw-2">&amp;</span>InternalPath::parse(<span class="string">&quot;bar/baz/index.html&quot;</span>).unwrap(),
+        Entry::Page(baz_page().into_dyn()),
+    );
+    site.root.insert_path(
+        <span class="kw-2">&amp;</span>InternalPath::parse(<span class="string">&quot;styles/main.css&quot;</span>).unwrap(),
+        Entry::Resource,
+    );
+    site
+}
+
+<span class="kw">fn </span>main() {
+    <span class="kw">let </span>site = simple_pedia_site();
+
+    static_site_main(<span class="kw-2">&amp;</span>site, <span class="kw-2">&amp;mut </span>Html, <span class="string">&quot;example/build&quot;</span>, <span class="string">&quot;example/assets&quot;</span>);
+}</code></pre></div>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="component/index.html" title="mod codedpedia::component">component</a></div><div class="desc docblock-short">This module exports the component trait and components provided by this
+crate.</div></li><li><div class="item-name"><a class="mod" href="hseq/index.html" title="mod codedpedia::hseq">hseq</a></div><div class="desc docblock-short">This module exports utilities to create heterogenous sequences of
+of any arbitrary types, useful for composing components.</div></li><li><div class="item-name"><a class="mod" href="location/index.html" title="mod codedpedia::location">location</a></div><div class="desc docblock-short">This module provides location, paths, Urls.</div></li><li><div class="item-name"><a class="mod" href="render/index.html" title="mod codedpedia::render">render</a></div><div class="desc docblock-short">This module exports items related to rendering components.</div></li><li><div class="item-name"><a class="mod" href="site/index.html" title="mod codedpedia::site">site</a></div><div class="desc docblock-short">This module provides a “filesystem-like” utility for organizing a site’s
+pages and effectively generating them.</div></li></ul><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2><ul class="item-table"><li><div class="item-name"><a class="macro" href="macro.Coproduct.html" title="macro codedpedia::Coproduct">Coproduct</a></div><div class="desc docblock-short">Defines a corpoduct type, i.e. an arbitrary enum.</div></li><li><div class="item-name"><a class="macro" href="macro.HArray.html" title="macro codedpedia::HArray">HArray</a></div><div class="desc docblock-short">Expands to the type of an heterogenous array.</div></li><li><div class="item-name"><a class="macro" href="macro.harray.html" title="macro codedpedia::harray">harray</a></div><div class="desc docblock-short">Constructs an “heterogenous array”, i.e. constructed with different types
+for different elements, but ends up with a single same type for the whole
+array, while preserving static dispatch.</div></li><li><div class="item-name"><a class="macro" href="macro.hiter.html" title="macro codedpedia::hiter">hiter</a></div><div class="desc docblock-short">Constructs an “heterogenous iterator”, i.e. constructed with different types
+for different items, but iterates as if it were a type, preserving static
+dispatch.</div></li><li><div class="item-name"><a class="macro" href="macro.hvec.html" title="macro codedpedia::hvec">hvec</a></div><div class="desc docblock-short">Constructs an “heterogenous vector”, i.e. constructed with different types
+for different elements, but ends up with a single same type for the whole
+vector, while preserving static dispatch.</div></li></ul><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2><ul class="item-table"><li><div class="item-name"><a class="fn" href="fn.static_site_main.html" title="fn codedpedia::static_site_main">static_site_main</a></div><div class="desc docblock-short">Main function of a static site targetting one format. A convenience over
+<a href="site/struct.Site.html#method.build" title="method codedpedia::site::Site::build"><code>site::Site::build</code></a>.</div></li></ul></section></div></main></body></html>
