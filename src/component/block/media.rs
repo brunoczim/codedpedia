@@ -9,6 +9,10 @@ use crate::{
 use std::fmt::{self, Write};
 
 /// An image component.
+///
+/// # HTML Classes
+///
+/// - `pedia-image` attached to an `<img>` element.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Image {
     /// Where the image is.
@@ -65,6 +69,11 @@ impl Render<Text> for Image {
 }
 
 /// A figure component, an image with legend.
+///
+/// # HTML Classes
+///
+/// - `pedia-figure` attached to a `<div>` element.
+/// - `pedia-figure-legend` attached to a `<div>` element.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Figure<L>
 where

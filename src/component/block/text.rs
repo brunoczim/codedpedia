@@ -8,6 +8,10 @@ use crate::{
 use std::fmt::{self, Write};
 
 /// This components wraps another component and its text bold.
+///
+/// # HTML Classes
+///
+/// - `pedia-bold` attached to a `<div>` element.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Bold<C>(pub C)
 where
@@ -66,6 +70,10 @@ where
 }
 
 /// This components wraps another component and its text italic.
+///
+/// # HTML Classes
+///
+/// - `pedia-italic` attached to a `<div>` element.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Italic<C>(pub C)
 where
@@ -87,7 +95,7 @@ where
         renderer: &mut Renderer<Html>,
         ctx: Context<Self::Kind>,
     ) -> std::fmt::Result {
-        renderer.write_str("<div class=\"pedia-bold\">")?;
+        renderer.write_str("<div class=\"pedia-italic\">")?;
         self.0.render(renderer, ctx)?;
         renderer.write_str("</div>")?;
         Ok(())
@@ -125,6 +133,10 @@ where
 
 /// This components wraps another component and its text preformatted. Suitable
 /// for code.
+///
+/// # HTML Classes
+///
+/// - `pedia-preformatted` attached to a `<div>` element.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Preformatted<C>(pub C)
 where
@@ -184,6 +196,10 @@ where
 
 /// Component that takes a portion of inline components and puts it into a
 /// paragraph.
+///
+/// # HTML Classes
+///
+/// - `pedia-paragraph` attached to a `<p>` element.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Paragraph<C>(pub C)
 where

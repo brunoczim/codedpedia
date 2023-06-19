@@ -26,6 +26,20 @@ pub struct PageComponent;
 impl ComponentKind for PageComponent {}
 
 /// The page: the outermost component in an article/page.
+///
+/// # HTML IDs
+///
+/// - `pedia-page-top` in a `<div>` element wrapping the whole page.
+/// - `pedia-page-body` in a `<div>` element.
+///
+/// # HTML Classes
+///
+/// - `pedia-title` in a `<h1>` element, surrounding a `pedia-title-link` in an
+///   `<a>` element (whose link is `#pedia-page-root`).
+/// - `pedia-page-body-wrapper` in a `<div>` element, surrounding the ID
+///   `pedia-page-body`.
+/// - `pedia-page-children` in a `<div>` element, inside
+///   `pedia-page-body-wrapper`, but not `pedia-page-body`.
 pub struct Page<A, B, L>
 where
     A: Component<Kind = AssetComponent>,

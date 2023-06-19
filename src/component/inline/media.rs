@@ -9,6 +9,10 @@ use crate::{
 use std::fmt::{self, Write};
 
 /// A playable audio.
+///
+/// # HTML Classes
+///
+/// - `pedia-audio` attached to an `<audio>` element.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Audio {
     /// Where the audio file is.

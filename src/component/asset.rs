@@ -16,6 +16,10 @@ pub struct AssetComponent;
 impl ComponentKind for AssetComponent {}
 
 /// Stylesheet asset.
+///
+/// # HTML Classes
+///
+/// - `<link>` element with no classes.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Stylesheet {
     /// Location to the stylesheet.
@@ -40,6 +44,10 @@ impl Render<Html> for Stylesheet {
 }
 
 /// JavaScript script asset.
+///
+/// # HTML Classes
+///
+/// - `<script>` element with no classes.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Script {
     /// Location to the script.

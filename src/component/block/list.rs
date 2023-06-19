@@ -14,6 +14,11 @@ use std::{
 
 /// An unordered list (typically displayed with bullets). The unnamed field can
 /// be a vector, an array, or anything that iterates by ref over a component.
+///
+/// # HTML Classes
+///
+/// - `pedia-unord-list` attached to an `<ul>` element.
+/// - `pedia-list-elem` attached to `<li>` elements.
 pub struct UnorderedList<L>(pub L)
 where
     L: IntoIterRef,
@@ -187,6 +192,11 @@ where
 /// An ordered list (typically displayed with item numbers). The unnamed field
 /// can be a vector, an array, or anything that iterates by ref over a
 /// component.
+///
+/// # HTML Classes
+///
+/// - `pedia-ord-list` attached to an `<ol>` element.
+/// - `pedia-list-elem` attached to `<li>` elements.
 pub struct OrderedList<L>(pub L)
 where
     L: IntoIterRef,

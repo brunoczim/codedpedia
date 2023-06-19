@@ -20,6 +20,17 @@ pub struct SectionComponent;
 impl ComponentKind for SectionComponent {}
 
 /// A page/article section.
+///
+/// # HTML Classes
+///
+/// - `pedia-section` and `pedia-section-N` in a `<div>` element depending on
+///   the depth of the section (N will contain the depth starting from `0`).
+/// - `pedia-title` in a `<h2>`, `<h3>`, etc element depending on the depth of
+///   the section.
+/// - `pedia-title-link` in an `<a>` element.
+/// - `pedia-section-body-wrapper` in a `<div>` element, surrounding
+///   `pedia-section-body` in a `<div>` element.
+/// - `pedia-section-children` in a `<div>` element.
 pub struct Section<T, B, L>
 where
     T: Component<Kind = InlineComponent>,

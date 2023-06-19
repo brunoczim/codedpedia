@@ -16,7 +16,7 @@ builtin component kinds are:
 - `table::RowComponent` - rows of a table;
 - `SectionComponent` - sections of an article/page;
 - `AssetComponent` - asset of an article/page;
-- `PageComponent` - the whole artcile/page.
+- `PageComponent` - the whole article/page.
 
 Rendering formats are a proxy to Rust's `fmt` which allows specific formatting
 e.g. in a specific context, such as in a nested list. More important than that

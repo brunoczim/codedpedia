@@ -23,7 +23,7 @@
 //! - [`AssetComponent`](component::asset::AssetComponent) - asset of an
 //!   article/page;
 //! - [`PageComponent`](component::page::PageComponent) - the whole
-//!   artcile/page.
+//!   article/page.
 //!
 //! Rendering formats are a proxy to Rust's `fmt` which allows specific
 //! formatting e.g. in a specific context, such as in a nested list. More

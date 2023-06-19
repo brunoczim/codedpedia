@@ -20,6 +20,10 @@ impl ComponentKind for BlockComponent {}
 /// however, that if you just use this in a section body, the outcome might not
 /// be desirable, but if you use this in a table cell, for example, it makes
 /// perfect sense.
+///
+/// # HTML Classes
+///
+/// - `pedia-inline-block` attached to a `<span>` element.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct InlineBlock<C>(pub C)
 where

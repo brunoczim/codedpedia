@@ -48,6 +48,11 @@ impl Default for CellAttrs {
 
 /// A table cell, that can be a header, and can span over multiple columns or
 /// rows.
+///
+/// # HTML Classes
+///
+/// - `pedia-table-header` attached to a `<th>` element if header.
+/// - `pedia-table-cell` attached to a `<td>` element if regular cell.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct Cell<T>
 where
@@ -143,6 +148,10 @@ where
 
 /// A row in a table. The single unnamed field could be an array, a vec, or
 /// anything that iterates by ref yielding cell components.
+///
+/// # HTML Classes
+///
+/// - `pedia-table-row` attached to a `<tr>` element.
 pub struct Row<C>(pub C)
 where
     C: IntoIterRef,
@@ -308,6 +317,11 @@ where
 
 /// A table. The single unnamed field could be an array, a vec, or
 /// anything that iterates by ref yielding row components.
+///
+/// # HTML Classes
+///
+/// - `pedia-table` attached to a `<div>` element surrounding a `<table>`
+///   element.
 pub struct Table<L>(pub L)
 where
     L: IntoIterRef,
