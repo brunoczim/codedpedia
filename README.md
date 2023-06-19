@@ -1,6 +1,6 @@
-# Paideia
+# Codedpedia
 
-Paideia is a static site generator designed for static encyclopedias that are
+Codedpedia is a static site generator designed for static encyclopedias that are
 programmed in Rust. The project can be resumed in a few items:
 - Components;
 - Component kinds;
@@ -8,7 +8,7 @@ programmed in Rust. The project can be resumed in a few items:
 - Sites.
 
 Components implement the `Component` trait and have a `ComponentKind`
-associated with it that serves for the purpose of typing components. Paideia's
+associated with it that serves for the purpose of typing components. Codedpedia's
 builtin component kinds are:
 - `InlineComponent` - components inlined in text;
 - `BlockComponent` - components with blocks of their own;
