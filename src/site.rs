@@ -118,10 +118,8 @@ where
         let source = resource_dir;
         let mut internal_path = InternalPath::default();
 
-        fs::remove_dir_all(&dest).map_err(|cause| BuildError {
-            path: internal_path.clone(),
-            cause,
-        })?;
+        let _ = fs::remove_dir_all(&dest)
+            .map_err(|cause| BuildError { path: internal_path.clone(), cause });
 
         let mut operations =
             vec![Operation::Build(Entry::Directory(&self.root))];
