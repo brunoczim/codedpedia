@@ -232,8 +232,6 @@
 <a href="#232" id="232">232</a>
 <a href="#233" id="233">233</a>
 <a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
 </pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
 
 </span><span class="doccomment">//! This tool allows you to generate static sites in encyclopedia-like format,
@@ -405,20 +403,18 @@
 //!
 //! fn simple_pedia_site() -&gt; Site&lt;DynFullComponent&lt;&#39;static, PageComponent&gt;&gt; {
 //!     let mut site = Site::default();
-//!     site.root.insert_path(
-//!         &amp;InternalPath::parse(&quot;index.html&quot;).unwrap(),
-//!         Entry::Page(index().into_dyn()),
-//!     );
-//!     site.root.insert_path(
-//!         &amp;InternalPath::parse(&quot;foo/index.html&quot;).unwrap(),
+//!     site.root
+//!         .insert_index(InternalPath::root(), Entry::Page(index().into_dyn()));
+//!     site.root.insert_index(
+//!         InternalPath::parse(&quot;foo&quot;).unwrap(),
 //!         Entry::Page(foo_page().into_dyn()),
 //!     );
-//!     site.root.insert_path(
-//!         &amp;InternalPath::parse(&quot;bar/index.html&quot;).unwrap(),
+//!     site.root.insert_index(
+//!         InternalPath::parse(&quot;bar&quot;).unwrap(),
 //!         Entry::Page(bar_page().into_dyn()),
 //!     );
-//!     site.root.insert_path(
-//!         &amp;InternalPath::parse(&quot;bar/baz/index.html&quot;).unwrap(),
+//!     site.root.insert_index(
+//!         InternalPath::parse(&quot;bar/baz&quot;).unwrap(),
 //!         Entry::Page(baz_page().into_dyn()),
 //!     );
 //!     site.root.insert_path(
