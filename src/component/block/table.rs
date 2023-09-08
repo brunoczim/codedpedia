@@ -494,9 +494,9 @@ where
     <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
 {
     /// The caption of this table.
-    caption: C,
+    pub caption: C,
     /// The table itself.
-    table: Table<L>,
+    pub table: Table<L>,
 }
 
 impl<C, L> fmt::Debug for CaptionedTable<C, L>
