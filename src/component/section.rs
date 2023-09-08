@@ -344,7 +344,7 @@ mod test {
         let rendered = RenderAsDisplay::new(
             Section {
                 title: "Hello",
-                id: Some(Id::new("hello").unwrap()),
+                id: Some(Id::new("hello")),
                 body: Paragraph("World!"),
                 children: harray![],
             },
@@ -389,7 +389,7 @@ mod test {
                     },
                     Section {
                         title: "Good",
-                        id: Some(Id::new("good").unwrap()),
+                        id: Some(Id::new("good")),
                         body: Paragraph("Afternoon!"),
                         children: harray![Section {
                             title: "By",
