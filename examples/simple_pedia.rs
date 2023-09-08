@@ -121,20 +121,18 @@ fn baz_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 
 fn simple_pedia_site() -> Site<DynFullComponent<'static, PageComponent>> {
     let mut site = Site::default();
-    site.root.insert_path(
-        &InternalPath::parse("index.html").unwrap(),
-        Entry::Page(index().into_dyn()),
-    );
-    site.root.insert_path(
-        &InternalPath::parse("foo/index.html").unwrap(),
+    site.root
+        .insert_index(InternalPath::root(), Entry::Page(index().into_dyn()));
+    site.root.insert_index(
+        InternalPath::parse("foo").unwrap(),
         Entry::Page(foo_page().into_dyn()),
     );
-    site.root.insert_path(
-        &InternalPath::parse("bar/index.html").unwrap(),
+    site.root.insert_index(
+        InternalPath::parse("bar").unwrap(),
         Entry::Page(bar_page().into_dyn()),
     );
-    site.root.insert_path(
-        &InternalPath::parse("bar/baz/index.html").unwrap(),
+    site.root.insert_index(
+        InternalPath::parse("bar/baz").unwrap(),
         Entry::Page(baz_page().into_dyn()),
     );
     site.root.insert_path(

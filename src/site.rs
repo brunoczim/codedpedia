@@ -266,6 +266,99 @@ where
             _ => Err(InsertPathError::NonDirEntry),
         }
     }
+
+    /// Inserts the given new entry at the given path, assuming it points to a
+    /// directory, and then appending a `/index.html` suffix. Path cannot fully
+    /// exist, and if part of it exists, it must be a sequence of
+    /// directories. Returns an `Err` if any error is found.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use codedpedia::{
+    ///     site::{Directory, Entry},
+    ///     component::page::Page,
+    ///     harray,
+    ///     location::InternalPath,
+    ///     render::{DynFullComponent, FullRender},
+    /// };
+    ///
+    /// # fn main() {
+    /// let mut directory = Directory::default();
+    /// directory.try_insert_index(
+    ///     InternalPath::parse("foo/bar").unwrap(),
+    ///     Entry::Page(Page {
+    ///         title: String::from("Foo Bar"),
+    ///         banner: harray![],
+    ///         assets: harray![],
+    ///         body: harray![],
+    ///         children: harray![],
+    ///     }),
+    /// )
+    /// .unwrap();
+    ///
+    /// assert!(
+    ///     directory
+    ///         .get(InternalPath::parse("foo/bar/index.html").unwrap())
+    ///         .unwrap()
+    ///         .is_page()
+    /// );
+    /// # }
+    /// ```
+    pub fn try_insert_index(
+        &mut self,
+        path: InternalPath,
+        new_entry: Entry<P>,
+    ) -> Result<(), InsertPathError> {
+        self.try_insert_path(
+            &path.append(Fragment::new("index.html").unwrap()),
+            new_entry,
+        )
+    }
+
+    /// Inserts the given new entry at the given path, assuming it points to a
+    /// directory, and then appending a `/index.html` suffix. Path cannot fully
+    /// exist, and if part of it exists, it must be a sequence of
+    /// directories.
+    ///
+    /// # Panic
+    /// Panics if any error is found.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use codedpedia::{
+    ///     site::{Directory, Entry},
+    ///     component::page::Page,
+    ///     harray,
+    ///     location::InternalPath,
+    ///     render::{DynFullComponent, FullRender},
+    /// };
+    ///
+    /// # fn main() {
+    /// let mut directory = Directory::default();
+    /// directory.insert_index(
+    ///     InternalPath::parse("foo/bar").unwrap(),
+    ///     Entry::Page(Page {
+    ///         title: String::from("Foo Bar"),
+    ///         banner: harray![],
+    ///         assets: harray![],
+    ///         body: harray![],
+    ///         children: harray![],
+    ///     }),
+    /// );
+    /// assert!(
+    ///     directory
+    ///         .get(InternalPath::parse("foo/bar/index.html").unwrap())
+    ///         .unwrap()
+    ///         .is_page()
+    /// );
+    /// # }
+    /// ```
+    pub fn insert_index(&mut self, path: InternalPath, new_entry: Entry<P>) {
+        self.try_insert_index(path, new_entry)
+            .expect("error found inserting path appending index")
+    }
 }
 
 /// An entry at a directory. Parametrized so pages and directories can be
@@ -423,12 +516,10 @@ mod test {
         },
         harray,
         location::{Fragment, InternalPath},
-        render::FullRender,
+        render::{DynFullComponent, FullRender},
     };
 
-    fn make_directory() -> Directory<
-        impl FullRender<Kind = PageComponent> + Eq + Send + Sync + 'static,
-    > {
+    fn make_directory() -> Directory<DynFullComponent<'static, PageComponent>> {
         Directory {
             entries: [
                 (
@@ -437,13 +528,16 @@ mod test {
                         entries: [
                             (
                                 Fragment::new("apple").unwrap(),
-                                Entry::Page(Page {
-                                    banner: InlineBlock("My Banner"),
-                                    title: String::from("My Page"),
-                                    assets: harray![],
-                                    body: Paragraph("hello"),
-                                    children: harray![],
-                                }),
+                                Entry::Page(
+                                    Page {
+                                        banner: InlineBlock("My Banner"),
+                                        title: String::from("My Page"),
+                                        assets: harray![],
+                                        body: Paragraph("hello"),
+                                        children: harray![],
+                                    }
+                                    .into_dyn(),
+                                ),
                             ),
                             (
                                 Fragment::new("audio.ogg").unwrap(),
@@ -491,5 +585,27 @@ mod test {
         assert!(dir
             .get(InternalPath::parse("avocado/grapes").unwrap())
             .is_none());
+    }
+
+    #[test]
+    fn insert_index_valid() {
+        let mut dir = make_directory();
+        dir.insert_index(
+            InternalPath::parse("new-fruit/morgot").unwrap(),
+            Entry::Page(
+                Page {
+                    banner: InlineBlock("My Banner"),
+                    title: String::from("My Page"),
+                    assets: harray![],
+                    body: Paragraph("hello"),
+                    children: harray![],
+                }
+                .into_dyn(),
+            ),
+        );
+        assert!(dir
+            .get(InternalPath::parse("new-fruit/morgot/index.html").unwrap())
+            .unwrap()
+            .is_page());
     }
 }
