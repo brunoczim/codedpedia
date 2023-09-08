@@ -64,6 +64,15 @@ where
     pub attrs: CellAttrs,
 }
 
+impl<T> From<T> for Cell<T>
+where
+    T: Component<Kind = BlockComponent>,
+{
+    fn from(child: T) -> Self {
+        Self { child, attrs: CellAttrs::default() }
+    }
+}
+
 impl<T> Component for Cell<T>
 where
     T: Component<Kind = BlockComponent>,
