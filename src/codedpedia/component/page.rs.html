@@ -388,6 +388,56 @@
 <a href="#388" id="388">388</a>
 <a href="#389" id="389">389</a>
 <a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module exports page component related utilities.
 
 </span><span class="kw">use super</span>::{
@@ -430,13 +480,16 @@
 ///   `pedia-page-body`.
 /// - `pedia-page-children` in a `&lt;div&gt;` element, inside
 ///   `pedia-page-body-wrapper`, but not `pedia-page-body`.
-</span><span class="kw">pub struct </span>Page&lt;A, B, L&gt;
+</span><span class="kw">pub struct </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt;,
+    </span>T: Component&lt;Kind = BlockComponent&gt;,
+    A: Component&lt;Kind = AssetComponent&gt;,
     B: Component&lt;Kind = BlockComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
+    <span class="doccomment">/// Banner placed above everything in the page.
+    </span><span class="kw">pub </span>banner: T,
     <span class="doccomment">/// Title of the page/article.
     </span><span class="kw">pub </span>title: String,
     <span class="doccomment">/// List of asset components. Can be an array, a vector, or anything that
@@ -449,9 +502,10 @@
     </span><span class="kw">pub </span>children: L,
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; fmt::Debug <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; fmt::Debug <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt;,
+    </span>T: Component&lt;Kind = BlockComponent&gt;,
+    A: Component&lt;Kind = AssetComponent&gt;,
     B: Component&lt;Kind = BlockComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
@@ -459,6 +513,7 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
         <span class="kw">let </span><span class="kw-2">mut </span>debug_fmtr = fmtr.debug_struct(<span class="string">&quot;Page&quot;</span>);
         debug_fmtr
+            .field(<span class="string">&quot;banner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.banner)
             .field(<span class="string">&quot;title&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.title)
             .field(<span class="string">&quot;assets&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.assets)
             .field(<span class="string">&quot;body&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.body);
@@ -469,15 +524,17 @@
     }
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; Clone <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; Clone <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt; + Clone,
+    </span>T: Component&lt;Kind = BlockComponent&gt; + Clone,
+    A: Component&lt;Kind = AssetComponent&gt; + Clone,
     B: Component&lt;Kind = BlockComponent&gt; + Clone,
     L: IntoIterRef + Clone,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
+            banner: <span class="self">self</span>.banner.clone(),
             title: <span class="self">self</span>.title.clone(),
             assets: <span class="self">self</span>.assets.clone(),
             body: <span class="self">self</span>.body.clone(),
@@ -486,67 +543,75 @@
     }
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; PartialEq <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; PartialEq <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt; + PartialEq,
+    </span>T: Component&lt;Kind = BlockComponent&gt; + PartialEq,
+    A: Component&lt;Kind = AssetComponent&gt; + PartialEq,
     B: Component&lt;Kind = BlockComponent&gt; + PartialEq,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + PartialEq,
 {
     <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.title == other.title
+        <span class="self">self</span>.banner == other.banner
+            &amp;&amp; <span class="self">self</span>.title == other.title
             &amp;&amp; <span class="self">self</span>.assets == other.assets
             &amp;&amp; <span class="self">self</span>.body == other.body
             &amp;&amp; <span class="self">self</span>.children.iter().eq(other.children.iter())
     }
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; Eq <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; Eq <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt; + Eq,
+    </span>T: Component&lt;Kind = BlockComponent&gt; + Eq,
+    A: Component&lt;Kind = AssetComponent&gt; + Eq,
     B: Component&lt;Kind = BlockComponent&gt; + Eq,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + Eq,
 {
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; PartialOrd <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; PartialOrd <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt; + PartialOrd,
+    </span>T: Component&lt;Kind = BlockComponent&gt; + PartialOrd,
+    A: Component&lt;Kind = AssetComponent&gt; + PartialOrd,
     B: Component&lt;Kind = BlockComponent&gt; + PartialOrd,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + PartialOrd,
 {
     <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
         <span class="kw">let </span>ordering = <span class="self">self
-            </span>.title
-            .partial_cmp(<span class="kw-2">&amp;</span>other.title)<span class="question-mark">?
-            </span>.then(<span class="self">self</span>.assets.partial_cmp(<span class="kw-2">&amp;</span>other.assets)<span class="question-mark">?</span>)
+            </span>.banner
+            .partial_cmp(<span class="kw-2">&amp;</span>other.banner)<span class="question-mark">?
+            </span>.then(<span class="self">self</span>.title.partial_cmp(<span class="kw-2">&amp;</span>other.title)<span class="question-mark">?</span>)
+            .then(<span class="self">self</span>.assets.partial_cmp(<span class="kw-2">&amp;</span>other.assets)<span class="question-mark">?</span>)
             .then(<span class="self">self</span>.body.partial_cmp(<span class="kw-2">&amp;</span>other.body)<span class="question-mark">?</span>)
             .then(<span class="self">self</span>.children.iter().partial_cmp(other.children.iter())<span class="question-mark">?</span>);
         <span class="prelude-val">Some</span>(ordering)
     }
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; Ord <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; Ord <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt; + Ord,
+    </span>T: Component&lt;Kind = BlockComponent&gt; + Ord,
+    A: Component&lt;Kind = AssetComponent&gt; + Ord,
     B: Component&lt;Kind = BlockComponent&gt; + Ord,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + Ord,
 {
     <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
-        <span class="self">self</span>.title
-            .cmp(<span class="kw-2">&amp;</span>other.title)
+        <span class="self">self</span>.banner
+            .cmp(<span class="kw-2">&amp;</span>other.banner)
+            .then_with(|| <span class="self">self</span>.title.cmp(<span class="kw-2">&amp;</span>other.title))
             .then_with(|| <span class="self">self</span>.assets.cmp(<span class="kw-2">&amp;</span>other.assets))
             .then_with(|| <span class="self">self</span>.body.cmp(<span class="kw-2">&amp;</span>other.body))
             .then_with(|| <span class="self">self</span>.children.iter().cmp(other.children.iter()))
     }
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; Hash <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; Hash <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt; + Hash,
+    </span>T: Component&lt;Kind = BlockComponent&gt; + Hash,
+    A: Component&lt;Kind = AssetComponent&gt; + Hash,
     B: Component&lt;Kind = BlockComponent&gt; + Hash,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt; + Hash,
@@ -555,6 +620,7 @@
     <span class="kw">where
         </span>H: Hasher,
     {
+        <span class="self">self</span>.banner.hash(state);
         <span class="self">self</span>.title.hash(state);
         <span class="self">self</span>.assets.hash(state);
         <span class="self">self</span>.body.hash(state);
@@ -564,15 +630,17 @@
         }
     }
 }
-<span class="kw">impl</span>&lt;A, B, L&gt; Default <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; Default <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt; + Default,
+    </span>T: Component&lt;Kind = BlockComponent&gt; + Default,
+    A: Component&lt;Kind = AssetComponent&gt; + Default,
     B: Component&lt;Kind = BlockComponent&gt; + Default,
     L: IntoIterRef + Default,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
 {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
+            banner: T::default(),
             title: String::default(),
             assets: A::default(),
             body: B::default(),
@@ -581,9 +649,10 @@
     }
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; Component <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; Component <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt;,
+    </span>T: Component&lt;Kind = BlockComponent&gt;,
+    A: Component&lt;Kind = AssetComponent&gt;,
     B: Component&lt;Kind = BlockComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Component&lt;Kind = SectionComponent&gt;,
@@ -591,9 +660,10 @@
     <span class="kw">type </span>Kind = PageComponent;
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; Render&lt;Html&gt; <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; Render&lt;Html&gt; <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Render&lt;Html, Kind = AssetComponent&gt;,
+    </span>T: Render&lt;Html, Kind = BlockComponent&gt;,
+    A: Render&lt;Html, Kind = AssetComponent&gt;,
     B: Render&lt;Html, Kind = BlockComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Html, Kind = SectionComponent&gt;,
@@ -612,16 +682,19 @@
         renderer.write_str(<span class="string">&quot;&lt;title&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
         renderer.write_str(
-            <span class="string">&quot;&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=\&quot;pedia-page-top\&quot; &gt;&lt;h1 \
-             class=\&quot;pedia-title\&quot;&gt;&lt;a class=\&quot;pedia-title-link\&quot; \
+            <span class="string">&quot;&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=\&quot;pedia-page-top\&quot;&gt;&lt;div \
+             id=\&quot;pedia-banner\&quot;&gt;&quot;</span>,
+        )<span class="question-mark">?</span>;
+        <span class="self">self</span>.banner.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
+        renderer.write_str(
+            <span class="string">&quot;&lt;/div&gt;&lt;h1 class=\&quot;pedia-title\&quot;&gt;&lt;a class=\&quot;pedia-title-link\&quot; \
              href=\&quot;#pedia-page-root\&quot;&gt;&quot;</span>,
         )<span class="question-mark">?</span>;
         <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
-        <span class="macro">write!</span>(
-            renderer,
+        renderer.write_str(
             <span class="string">&quot;&lt;/a&gt;&lt;/h1&gt;&lt;div id=\&quot;pedia-page-body-wrapper\&quot;&gt;&lt;div \
-             id=\&quot;pedia-page-body\&quot;&gt;&quot;
-        </span>)<span class="question-mark">?</span>;
+             id=\&quot;pedia-page-body\&quot;&gt;&quot;</span>,
+        )<span class="question-mark">?</span>;
         <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;&lt;/div&gt;&lt;div id=\&quot;pedia-page-children\&quot;&gt;&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">for </span>child <span class="kw">in </span><span class="self">self</span>.children.iter() {
@@ -632,9 +705,10 @@
     }
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; Render&lt;Markdown&gt; <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; Render&lt;Markdown&gt; <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt;,
+    </span>T: Render&lt;Markdown, Kind = BlockComponent&gt;,
+    A: Component&lt;Kind = AssetComponent&gt;,
     B: Render&lt;Markdown, Kind = BlockComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Markdown, Kind = SectionComponent&gt;,
@@ -644,6 +718,8 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Markdown&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
+        <span class="self">self</span>.banner.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;\n\n&quot;</span>)<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;# &quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;\n\n&quot;</span>)<span class="question-mark">?</span>;
@@ -655,9 +731,10 @@
     }
 }
 
-<span class="kw">impl</span>&lt;A, B, L&gt; Render&lt;Text&gt; <span class="kw">for </span>Page&lt;A, B, L&gt;
+<span class="kw">impl</span>&lt;T, A, B, L&gt; Render&lt;Text&gt; <span class="kw">for </span>Page&lt;T, A, B, L&gt;
 <span class="kw">where
-    </span>A: Component&lt;Kind = AssetComponent&gt;,
+    </span>T: Render&lt;Text, Kind = BlockComponent&gt;,
+    A: Component&lt;Kind = AssetComponent&gt;,
     B: Render&lt;Text, Kind = BlockComponent&gt;,
     L: IntoIterRef,
     &lt;L <span class="kw">as </span>IntoIterRef&gt;::Item: Render&lt;Text, Kind = SectionComponent&gt;,
@@ -667,6 +744,8 @@
         renderer: <span class="kw-2">&amp;mut </span>Renderer&lt;Text&gt;,
         ctx: Context&lt;<span class="self">Self</span>::Kind&gt;,
     ) -&gt; fmt::Result {
+        <span class="self">self</span>.banner.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
+        renderer.write_str(<span class="string">&quot;\n\n&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.title.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>InlineComponent))<span class="question-mark">?</span>;
         renderer.write_str(<span class="string">&quot;\n\n&quot;</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.body.render(renderer, ctx.with_kind(<span class="kw-2">&amp;</span>BlockComponent))<span class="question-mark">?</span>;
@@ -683,7 +762,7 @@
     <span class="kw">use crate</span>::{
         component::{
             asset::{Script, Stylesheet},
-            block::text::Paragraph,
+            block::{text::Paragraph, InlineBlock},
             section::Section,
         },
         harray,
@@ -697,9 +776,28 @@
     };
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>page_without_banner_is_valid_html() {
+        <span class="kw">let </span>rendered = RenderAsDisplay::new(
+            Page {
+                banner: <span class="macro">harray!</span>[],
+                title: String::from(<span class="string">&quot;Hello&quot;</span>),
+                assets: <span class="macro">harray!</span>[],
+                body: Paragraph(<span class="string">&quot;World!&quot;</span>),
+                children: <span class="macro">harray!</span>[],
+            },
+            <span class="kw-2">&amp;mut </span>Html::default(),
+            Context::new(<span class="kw-2">&amp;</span>InternalPath::default(), <span class="kw-2">&amp;</span>PageComponent),
+        )
+        .to_string();
+
+        validate_html_document(<span class="kw-2">&amp;</span>rendered).unwrap();
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>page_without_assets_is_valid_html() {
         <span class="kw">let </span>rendered = RenderAsDisplay::new(
             Page {
+                banner: InlineBlock(<span class="string">&quot;My Encyclopedia&quot;</span>),
                 title: String::from(<span class="string">&quot;Hello&quot;</span>),
                 assets: <span class="macro">harray!</span>[],
                 body: Paragraph(<span class="string">&quot;World!&quot;</span>),
@@ -717,6 +815,7 @@
     </span><span class="kw">fn </span>page_with_assets_is_valid_html() {
         <span class="kw">let </span>rendered = RenderAsDisplay::new(
             Page {
+                banner: InlineBlock(<span class="string">&quot;My Encyclopedia&quot;</span>),
                 title: String::from(<span class="string">&quot;Hello&quot;</span>),
                 assets: <span class="macro">harray!</span>[
                     Stylesheet {
@@ -739,6 +838,7 @@
     </span><span class="kw">fn </span>page_with_children_is_valid_html() {
         <span class="kw">let </span>rendered = RenderAsDisplay::new(
             Page {
+                banner: InlineBlock(<span class="string">&quot;My Encyclopedia&quot;</span>),
                 title: String::from(<span class="string">&quot;Hello&quot;</span>),
                 assets: <span class="macro">harray!</span>[Stylesheet {
                     location: Location::internal(<span class="string">&quot;styles/main.css&quot;</span>),

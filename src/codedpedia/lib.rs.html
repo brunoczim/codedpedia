@@ -226,6 +226,14 @@
 <a href="#226" id="226">226</a>
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
 </pre></div><pre class="rust"><code><span class="attr">#![warn(missing_docs)]
 
 </span><span class="doccomment">//! This tool allows you to generate static sites in encyclopedia-like format,
@@ -281,6 +289,7 @@
 //!         inline::text::Link,
 //!         page::{Page, PageComponent},
 //!         section::Section,
+//!         BlockComponent,
 //!     },
 //!     harray,
 //!     location::{Id, InternalPath, Location},
@@ -294,15 +303,22 @@
 //!     [Stylesheet { location: Location::internal(&quot;styles/main.css&quot;) }]
 //! }
 //!
-//! fn index() -&gt; impl FullRender&lt;Kind = PageComponent&gt; + Send + Sync + &#39;static
-//! {
+//! fn banner() -&gt; impl FullRender&lt;Kind = BlockComponent&gt; + Send + Sync + &#39;static {
+//!     InlineBlock(Link {
+//!         target: &quot;Simple Pedia&quot;,
+//!         location: Location::internal(&quot;&quot;),
+//!     })
+//! }
+//!
+//! fn index() -&gt; impl FullRender&lt;Kind = PageComponent&gt; + Send + Sync + &#39;static {
 //!     Page {
+//!         banner: banner(),
 //!         title: String::from(&quot;Simple Pedia&quot;),
 //!         assets: default_assets(),
 //!         body: harray![
 //!             Paragraph(
-//!                 &quot;This is the initial page of the simple pedia. You can \
-//!                  dive down into the following:&quot;
+//!                 &quot;This is the initial page of the simple pedia. You can dive \
+//!                  down into the following:&quot;
 //!             ),
 //!             UnorderedList(harray![
 //!                 InlineBlock(Link {
@@ -349,9 +365,9 @@
 //!     }
 //! }
 //!
-//! fn foo_page(
-//! ) -&gt; impl FullRender&lt;Kind = PageComponent&gt; + Send + Sync + &#39;static {
+//! fn foo_page() -&gt; impl FullRender&lt;Kind = PageComponent&gt; + Send + Sync + &#39;static {
 //!     Page {
+//!         banner: banner(),
 //!         title: String::from(&quot;Foo&quot;),
 //!         assets: default_assets(),
 //!         body: harray![Paragraph(&quot;Foo is a metavariable.&quot;),],
@@ -359,9 +375,9 @@
 //!     }
 //! }
 //!
-//! fn bar_page(
-//! ) -&gt; impl FullRender&lt;Kind = PageComponent&gt; + Send + Sync + &#39;static {
+//! fn bar_page() -&gt; impl FullRender&lt;Kind = PageComponent&gt; + Send + Sync + &#39;static {
 //!     Page {
+//!         banner: banner(),
 //!         title: String::from(&quot;Bar&quot;),
 //!         assets: default_assets(),
 //!         body: harray![Paragraph(harray![
@@ -373,9 +389,9 @@
 //!     }
 //! }
 //!
-//! fn baz_page(
-//! ) -&gt; impl FullRender&lt;Kind = PageComponent&gt; + Send + Sync + &#39;static {
+//! fn baz_page() -&gt; impl FullRender&lt;Kind = PageComponent&gt; + Send + Sync + &#39;static {
 //!     Page {
+//!         banner: banner(),
 //!         title: String::from(&quot;Baz&quot;),
 //!         assets: default_assets(),
 //!         body: harray![Paragraph(harray![

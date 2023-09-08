@@ -492,6 +492,7 @@
 <a href="#492" id="492">492</a>
 <a href="#493" id="493">493</a>
 <a href="#494" id="494">494</a>
+<a href="#495" id="495">495</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module provides a &quot;filesystem-like&quot; utility for organizing a site&#39;s
 //! pages and effectively generating them.
 
@@ -912,7 +913,7 @@
     <span class="kw">use super</span>::{Directory, Entry};
     <span class="kw">use crate</span>::{
         component::{
-            block::text::Paragraph,
+            block::{text::Paragraph, InlineBlock},
             page::{Page, PageComponent},
         },
         harray,
@@ -932,6 +933,7 @@
                             (
                                 Fragment::new(<span class="string">&quot;apple&quot;</span>).unwrap(),
                                 Entry::Page(Page {
+                                    banner: InlineBlock(<span class="string">&quot;My Banner&quot;</span>),
                                     title: String::from(<span class="string">&quot;My Page&quot;</span>),
                                     assets: <span class="macro">harray!</span>[],
                                     body: Paragraph(<span class="string">&quot;hello&quot;</span>),
