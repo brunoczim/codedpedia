@@ -95,12 +95,12 @@ output.</p>
         children: <span class="macro">harray!</span>[
             Section {
                 title: <span class="string">&quot;Random Section&quot;</span>,
-                id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;random&quot;</span>).unwrap()),
+                id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;random&quot;</span>)),
                 body: Paragraph(<span class="string">&quot;This is a random paragraph.&quot;</span>),
                 children: <span class="macro">harray!</span>[
                     Section {
                         title: <span class="string">&quot;Randomly First&quot;</span>,
-                        id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;random-first&quot;</span>).unwrap()),
+                        id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;random-first&quot;</span>)),
                         body: Paragraph(
                             <span class="string">&quot;This the first (really?) random paragraph.&quot;
                         </span>),
@@ -108,7 +108,7 @@ output.</p>
                     },
                     Section {
                         title: <span class="string">&quot;Randomly Second&quot;</span>,
-                        id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;random-second&quot;</span>).unwrap()),
+                        id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;random-second&quot;</span>)),
                         body: Paragraph(
                             <span class="string">&quot;This the second (really??) random paragraph.&quot;
                         </span>),
@@ -118,7 +118,7 @@ output.</p>
             },
             Section {
                 title: <span class="string">&quot;Weird Title&quot;</span>,
-                id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;weird&quot;</span>).unwrap()),
+                id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;weird&quot;</span>)),
                 body: Paragraph(<span class="string">&quot;Weird paragraph as an example&quot;</span>),
                 children: <span class="macro">harray!</span>[],
             }
@@ -169,19 +169,19 @@ output.</p>
     site.root
         .insert_index(InternalPath::root(), Entry::Page(index().into_dyn()));
     site.root.insert_index(
-        InternalPath::parse(<span class="string">&quot;foo&quot;</span>).unwrap(),
+        InternalPath::parse(<span class="string">&quot;foo&quot;</span>),
         Entry::Page(foo_page().into_dyn()),
     );
     site.root.insert_index(
-        InternalPath::parse(<span class="string">&quot;bar&quot;</span>).unwrap(),
+        InternalPath::parse(<span class="string">&quot;bar&quot;</span>),
         Entry::Page(bar_page().into_dyn()),
     );
     site.root.insert_index(
-        InternalPath::parse(<span class="string">&quot;bar/baz&quot;</span>).unwrap(),
+        InternalPath::parse(<span class="string">&quot;bar/baz&quot;</span>),
         Entry::Page(baz_page().into_dyn()),
     );
     site.root.insert_path(
-        <span class="kw-2">&amp;</span>InternalPath::parse(<span class="string">&quot;styles/main.css&quot;</span>).unwrap(),
+        <span class="kw-2">&amp;</span>InternalPath::parse(<span class="string">&quot;styles/main.css&quot;</span>),
         Entry::Resource,
     );
     site

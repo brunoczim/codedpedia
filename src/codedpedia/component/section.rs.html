@@ -760,7 +760,7 @@
         <span class="kw">let </span>rendered = RenderAsDisplay::new(
             Section {
                 title: <span class="string">&quot;Hello&quot;</span>,
-                id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;hello&quot;</span>).unwrap()),
+                id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;hello&quot;</span>)),
                 body: Paragraph(<span class="string">&quot;World!&quot;</span>),
                 children: <span class="macro">harray!</span>[],
             },
@@ -805,7 +805,7 @@
                     },
                     Section {
                         title: <span class="string">&quot;Good&quot;</span>,
-                        id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;good&quot;</span>).unwrap()),
+                        id: <span class="prelude-val">Some</span>(Id::new(<span class="string">&quot;good&quot;</span>)),
                         body: Paragraph(<span class="string">&quot;Afternoon!&quot;</span>),
                         children: <span class="macro">harray!</span>[Section {
                             title: <span class="string">&quot;By&quot;</span>,
