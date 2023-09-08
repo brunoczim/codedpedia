@@ -53,6 +53,7 @@
 //!         inline::text::Link,
 //!         page::{Page, PageComponent},
 //!         section::Section,
+//!         BlockComponent,
 //!     },
 //!     harray,
 //!     location::{Id, InternalPath, Location},
@@ -66,15 +67,22 @@
 //!     [Stylesheet { location: Location::internal("styles/main.css") }]
 //! }
 //!
-//! fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static
-//! {
+//! fn banner() -> impl FullRender<Kind = BlockComponent> + Send + Sync + 'static {
+//!     InlineBlock(Link {
+//!         target: "Simple Pedia",
+//!         location: Location::internal(""),
+//!     })
+//! }
+//!
+//! fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
+//!         banner: banner(),
 //!         title: String::from("Simple Pedia"),
 //!         assets: default_assets(),
 //!         body: harray![
 //!             Paragraph(
-//!                 "This is the initial page of the simple pedia. You can \
-//!                  dive down into the following:"
+//!                 "This is the initial page of the simple pedia. You can dive \
+//!                  down into the following:"
 //!             ),
 //!             UnorderedList(harray![
 //!                 InlineBlock(Link {
@@ -121,9 +129,9 @@
 //!     }
 //! }
 //!
-//! fn foo_page(
-//! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
+//! fn foo_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
+//!         banner: banner(),
 //!         title: String::from("Foo"),
 //!         assets: default_assets(),
 //!         body: harray![Paragraph("Foo is a metavariable."),],
@@ -131,9 +139,9 @@
 //!     }
 //! }
 //!
-//! fn bar_page(
-//! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
+//! fn bar_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
+//!         banner: banner(),
 //!         title: String::from("Bar"),
 //!         assets: default_assets(),
 //!         body: harray![Paragraph(harray![
@@ -145,9 +153,9 @@
 //!     }
 //! }
 //!
-//! fn baz_page(
-//! ) -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
+//! fn baz_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 //!     Page {
+//!         banner: banner(),
 //!         title: String::from("Baz"),
 //!         assets: default_assets(),
 //!         body: harray![Paragraph(harray![

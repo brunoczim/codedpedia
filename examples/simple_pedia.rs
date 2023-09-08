@@ -5,6 +5,7 @@ use codedpedia::{
         inline::text::Link,
         page::{Page, PageComponent},
         section::Section,
+        BlockComponent,
     },
     harray,
     location::{Id, InternalPath, Location},
@@ -18,8 +19,16 @@ fn default_assets(
     [Stylesheet { location: Location::internal("styles/main.css") }]
 }
 
+fn banner() -> impl FullRender<Kind = BlockComponent> + Send + Sync + 'static {
+    InlineBlock(Link {
+        target: "Simple Pedia",
+        location: Location::internal(""),
+    })
+}
+
 fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
+        banner: banner(),
         title: String::from("Simple Pedia"),
         assets: default_assets(),
         body: harray![
@@ -74,6 +83,7 @@ fn index() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 
 fn foo_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
+        banner: banner(),
         title: String::from("Foo"),
         assets: default_assets(),
         body: harray![Paragraph("Foo is a metavariable."),],
@@ -83,6 +93,7 @@ fn foo_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 
 fn bar_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
+        banner: banner(),
         title: String::from("Bar"),
         assets: default_assets(),
         body: harray![Paragraph(harray![
@@ -96,6 +107,7 @@ fn bar_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
 
 fn baz_page() -> impl FullRender<Kind = PageComponent> + Send + Sync + 'static {
     Page {
+        banner: banner(),
         title: String::from("Baz"),
         assets: default_assets(),
         body: harray![Paragraph(harray![
