@@ -64,6 +64,15 @@ where
     pub attrs: CellAttrs,
 }
 
+impl<T> From<T> for Cell<T>
+where
+    T: Component<Kind = BlockComponent>,
+{
+    fn from(child: T) -> Self {
+        Self { child, attrs: CellAttrs::default() }
+    }
+}
+
 impl<T> Component for Cell<T>
 where
     T: Component<Kind = BlockComponent>,
@@ -494,9 +503,9 @@ where
     <L as IntoIterRef>::Item: Component<Kind = RowComponent>,
 {
     /// The caption of this table.
-    caption: C,
+    pub caption: C,
     /// The table itself.
-    table: Table<L>,
+    pub table: Table<L>,
 }
 
 impl<C, L> fmt::Debug for CaptionedTable<C, L>
