@@ -418,7 +418,7 @@ mod test {
     use super::{Directory, Entry};
     use crate::{
         component::{
-            block::text::Paragraph,
+            block::{text::Paragraph, InlineBlock},
             page::{Page, PageComponent},
         },
         harray,
@@ -438,6 +438,7 @@ mod test {
                             (
                                 Fragment::new("apple").unwrap(),
                                 Entry::Page(Page {
+                                    banner: InlineBlock("My Banner"),
                                     title: String::from("My Page"),
                                     assets: harray![],
                                     body: Paragraph("hello"),

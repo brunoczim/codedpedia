@@ -29,6 +29,17 @@ html, body, #pedia-page-wrapper {
     border-left: solid 1pt #000000;
 }
 
+#pedia-banner {
+    padding: 10pt;
+    border: solid 1px black;
+    width: fit-content;
+}
+
+#pedia-banner a {
+    color: black;
+    font-weight: bold;
+}
+
 .pedia-bold, .pedia-bold * {
     font-weight: bold;
 }
