@@ -413,7 +413,7 @@ mod test {
                     },
                     Section {
                         title: "Good",
-                        id: Some(Id::new("good").unwrap()),
+                        id: Some(Id::new("good")),
                         body: Paragraph("Afternoon!"),
                         children: harray![Section {
                             title: "By",

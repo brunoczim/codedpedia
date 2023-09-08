@@ -286,7 +286,7 @@ where
     /// # fn main() {
     /// let mut directory = Directory::default();
     /// directory.try_insert_index(
-    ///     InternalPath::parse("foo/bar").unwrap(),
+    ///     InternalPath::parse("foo/bar"),
     ///     Entry::Page(Page {
     ///         title: String::from("Foo Bar"),
     ///         banner: harray![],
@@ -299,7 +299,7 @@ where
     ///
     /// assert!(
     ///     directory
-    ///         .get(InternalPath::parse("foo/bar/index.html").unwrap())
+    ///         .get(InternalPath::parse("foo/bar/index.html"))
     ///         .unwrap()
     ///         .is_page()
     /// );
@@ -310,10 +310,7 @@ where
         path: InternalPath,
         new_entry: Entry<P>,
     ) -> Result<(), InsertPathError> {
-        self.try_insert_path(
-            &path.append(Fragment::new("index.html").unwrap()),
-            new_entry,
-        )
+        self.try_insert_path(&path.append("index.html"), new_entry)
     }
 
     /// Inserts the given new entry at the given path, assuming it points to a
@@ -338,7 +335,7 @@ where
     /// # fn main() {
     /// let mut directory = Directory::default();
     /// directory.insert_index(
-    ///     InternalPath::parse("foo/bar").unwrap(),
+    ///     InternalPath::parse("foo/bar"),
     ///     Entry::Page(Page {
     ///         title: String::from("Foo Bar"),
     ///         banner: harray![],
@@ -349,7 +346,7 @@ where
     /// );
     /// assert!(
     ///     directory
-    ///         .get(InternalPath::parse("foo/bar/index.html").unwrap())
+    ///         .get(InternalPath::parse("foo/bar/index.html"))
     ///         .unwrap()
     ///         .is_page()
     /// );
@@ -523,11 +520,11 @@ mod test {
         Directory {
             entries: [
                 (
-                    Fragment::new("avocado").unwrap(),
+                    Fragment::new("avocado"),
                     Entry::Directory(Directory {
                         entries: [
                             (
-                                Fragment::new("apple").unwrap(),
+                                Fragment::new("apple"),
                                 Entry::Page(
                                     Page {
                                         banner: InlineBlock("My Banner"),
@@ -539,16 +536,13 @@ mod test {
                                     .into_dyn(),
                                 ),
                             ),
-                            (
-                                Fragment::new("audio.ogg").unwrap(),
-                                Entry::Resource,
-                            ),
+                            (Fragment::new("audio.ogg"), Entry::Resource),
                         ]
                         .into_iter()
                         .collect(),
                     }),
                 ),
-                (Fragment::new("pineapple").unwrap(), Entry::Resource),
+                (Fragment::new("pineapple"), Entry::Resource),
             ]
             .into_iter()
             .collect(),
@@ -558,23 +552,20 @@ mod test {
     #[test]
     fn access_fragment_valid() {
         let dir = make_directory();
-        assert!(dir
-            .get(Fragment::new("avocado").unwrap())
-            .unwrap()
-            .is_directory());
+        assert!(dir.get(Fragment::new("avocado")).unwrap().is_directory());
     }
 
     #[test]
     fn access_fragment_invalid() {
         let dir = make_directory();
-        assert!(dir.get(Fragment::new("grapes").unwrap()).is_none());
+        assert!(dir.get(Fragment::new("grapes")).is_none());
     }
 
     #[test]
     fn access_internal_path_valid() {
         let dir = make_directory();
         assert!(dir
-            .get(InternalPath::parse("avocado/apple").unwrap())
+            .get(InternalPath::parse("avocado/apple"))
             .unwrap()
             .is_page());
     }
@@ -582,16 +573,14 @@ mod test {
     #[test]
     fn access_internal_path_invalid() {
         let dir = make_directory();
-        assert!(dir
-            .get(InternalPath::parse("avocado/grapes").unwrap())
-            .is_none());
+        assert!(dir.get(InternalPath::parse("avocado/grapes")).is_none());
     }
 
     #[test]
     fn insert_index_valid() {
         let mut dir = make_directory();
         dir.insert_index(
-            InternalPath::parse("new-fruit/morgot").unwrap(),
+            InternalPath::parse("new-fruit/morgot"),
             Entry::Page(
                 Page {
                     banner: InlineBlock("My Banner"),
@@ -604,7 +593,7 @@ mod test {
             ),
         );
         assert!(dir
-            .get(InternalPath::parse("new-fruit/morgot/index.html").unwrap())
+            .get(InternalPath::parse("new-fruit/morgot/index.html"))
             .unwrap()
             .is_page());
     }

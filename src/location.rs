@@ -6,6 +6,7 @@ use crate::{
 };
 use percent_encoding::{percent_encode, CONTROLS};
 use std::{
+    convert::Infallible,
     error::Error,
     fmt::{self, Write},
     path::PathBuf,
@@ -60,17 +61,24 @@ impl Location {
     }
 
     /// Parses an internal location but returns a generic location.
+    pub fn try_internal<S>(contents: S) -> Result<Self, InvalidInternalLoc>
+    where
+        S: AsRef<str>,
+    {
+        InternalLoc::try_parse(contents).map(Location::Internal)
+    }
+
+    /// Parses an internal location but returns a generic location.
     ///
     /// # Panics
     ///
-    /// Panics if the location string is invalid.
+    /// Panics if the location string is invalid (for a non-panicking version,
+    /// see [`Location::try_internal`].
     pub fn internal<S>(contents: S) -> Self
     where
         S: AsRef<str>,
     {
-        Location::Internal(
-            InternalLoc::parse(contents).expect("bad internal location"),
-        )
+        Self::try_internal(contents).expect("failed to parse internal location")
     }
 }
 
@@ -127,7 +135,7 @@ pub struct InternalPath {
 
 impl InternalPath {
     /// Parser the internal path. Fragments separated by "/".
-    pub fn parse<S>(string: S) -> Result<Self, InvalidFragment>
+    pub fn try_parse<S>(string: S) -> Result<Self, InvalidFragment>
     where
         S: AsRef<str>,
     {
@@ -136,11 +144,24 @@ impl InternalPath {
 
         if string.len() > 0 {
             for fragment in string.split('/') {
-                this.fragments.push(Fragment::new(fragment)?);
+                this.fragments.push(Fragment::try_new(fragment)?);
             }
         }
 
         Ok(this)
+    }
+
+    /// Parser the internal path. Fragments separated by "/".
+    ///
+    /// # Panic
+    ///
+    /// Panics if the given string is not a valid internal path (for a
+    /// non-panicking version, see [`InternalPath::try_parse`].
+    pub fn parse<S>(string: S) -> Self
+    where
+        S: AsRef<str>,
+    {
+        Self::try_parse(string).expect("failed to parse InternalPath")
     }
 
     /// Path to the root of the encyclopedia.
@@ -165,9 +186,27 @@ impl InternalPath {
 
     /// Appends a fragment (a piece) to the end of this path. Returns the
     /// modified path.
-    pub fn append(mut self, fragment: Fragment) -> Self {
-        self.fragments.push(fragment);
-        self
+    ///
+    /// # Panic
+    ///
+    /// Panics if the given appendable is not a valid fragment (for a
+    /// non-panicking version see [`InternalPath::try_append`].
+    pub fn append<A>(self, appendable: A) -> Self
+    where
+        A: PathAppendable,
+    {
+        self.try_append(appendable)
+            .expect("failed to parse appendable fragment")
+    }
+
+    /// Appends a fragment (a piece) to the end of this path. Returns the
+    /// modified path.
+    pub fn try_append<A>(mut self, appendable: A) -> Result<Self, A::Error>
+    where
+        A: PathAppendable,
+    {
+        appendable.append(&mut self)?;
+        Ok(self)
     }
 
     /// Compares two locations taking "index" into account and ignoring its
@@ -316,10 +355,10 @@ impl From<InternalPath> for InternalLoc {
 }
 
 impl InternalLoc {
-    /// Parses247     } an internal location. Path fragments separated by "/",
+    /// Parses an internal location. Path fragments separated by "/",
     /// ID appended to the end with "#" between the path and the ID, if any
     /// ID at all.
-    pub fn parse<S>(string: S) -> Result<Self, InvalidInternalLoc>
+    pub fn try_parse<S>(string: S) -> Result<Self, InvalidInternalLoc>
     where
         S: AsRef<str>,
     {
@@ -331,13 +370,28 @@ impl InternalLoc {
             .unwrap_or(string.len());
 
         Ok(Self {
-            path: InternalPath::parse(&string[.. hash])?,
+            path: InternalPath::try_parse(&string[.. hash])?,
             id: if hash == string.len() {
                 None
             } else {
-                Some(Id::new(&string[hash + 1 ..])?)
+                Some(Id::try_new(&string[hash + 1 ..])?)
             },
         })
+    }
+
+    /// Parses an internal location. Path fragments separated by "/",
+    /// ID appended to the end with "#" between the path and the ID, if any
+    /// ID at all.
+    ///
+    /// # Panic
+    ///
+    /// Panics if the given string is not a valid internal location (for a
+    /// non-panicking version, see [`InternalLoc::try_parse`].
+    pub fn parse<S>(string: S) -> Self
+    where
+        S: AsRef<str>,
+    {
+        Self::try_parse(string).expect("failed to parse internal location")
     }
 
     fn render_as_url<W>(
@@ -425,7 +479,7 @@ pub struct Id {
 impl Id {
     /// Creates an ID from the desired string contents. The string can only
     /// contain alphanumeric characters or '_' or '-'.
-    pub fn new<S>(contents: S) -> Result<Self, InvalidId>
+    pub fn try_new<S>(contents: S) -> Result<Self, InvalidId>
     where
         S: AsRef<str> + Into<Box<str>>,
     {
@@ -440,6 +494,20 @@ impl Id {
         }
 
         Ok(Self { contents: contents.into() })
+    }
+
+    /// Creates an ID from the desired string contents. The string can only
+    /// contain alphanumeric characters or '_' or '-'.
+    ///
+    /// # Panic
+    ///
+    /// Panics if the ID is invalid (for a non-panicking version, see
+    /// [`Id::try_new`]).
+    pub fn new<S>(contents: S) -> Self
+    where
+        S: AsRef<str> + Into<Box<str>>,
+    {
+        Self::try_new(contents).expect("failed parsing Id")
     }
 
     /// The string contents of this ID.
@@ -494,7 +562,7 @@ impl Fragment {
     /// Creates a fragment from the desired string contents. The string cannot
     /// contain '/' or '#', it cannot be empty or composed of only "." or
     /// ".." as well.
-    pub fn new<S>(contents: S) -> Result<Self, InvalidFragment>
+    pub fn try_new<S>(contents: S) -> Result<Self, InvalidFragment>
     where
         S: AsRef<str> + Into<Box<str>>,
     {
@@ -511,6 +579,21 @@ impl Fragment {
         Ok(Self { contents: contents.into() })
     }
 
+    /// Creates a fragment from the desired string contents. The string cannot
+    /// contain '/' or '#', it cannot be empty or composed of only "." or
+    /// ".." as well.
+    ///
+    /// # Panic
+    ///
+    /// Panics if the string is not a valid fragment (For non-panicking version,
+    /// see [`Fragment::try_new`]).
+    pub fn new<S>(contents: S) -> Self
+    where
+        S: AsRef<str> + Into<Box<str>>,
+    {
+        Self::try_new(contents).expect("failed to parse Fragment")
+    }
+
     /// The string contents of this fragment.
     pub fn as_str(&self) -> &str {
         &self.contents
@@ -523,15 +606,67 @@ impl fmt::Display for Fragment {
     }
 }
 
+/// Trait generalizing the operation [`InternalPath::append`] and
+/// [`InternalPath::try_append`]. Such methods are intended to be API-friendly
+/// methods for appending fragments to internal paths.
+pub trait PathAppendable {
+    /// Possible error happening during the appending.
+    type Error: fmt::Debug;
+
+    /// Append `self` to `to_path` at the end of the path.
+    fn append(self, to_path: &mut InternalPath) -> Result<(), Self::Error>;
+}
+
+impl PathAppendable for Fragment {
+    type Error = Infallible;
+
+    fn append(self, to_path: &mut InternalPath) -> Result<(), Self::Error> {
+        to_path.fragments.push(self);
+        Ok(())
+    }
+}
+
+impl<'input> PathAppendable for &'input str {
+    type Error = InvalidFragment;
+
+    fn append(self, to_path: &mut InternalPath) -> Result<(), Self::Error> {
+        match Fragment::try_new(self)?.append(to_path) {
+            Ok(()) => Ok(()),
+            Err(impossible) => match impossible {},
+        }
+    }
+}
+
+impl PathAppendable for String {
+    type Error = InvalidFragment;
+
+    fn append(self, to_path: &mut InternalPath) -> Result<(), Self::Error> {
+        match Fragment::try_new(self)?.append(to_path) {
+            Ok(()) => Ok(()),
+            Err(impossible) => match impossible {},
+        }
+    }
+}
+
+impl PathAppendable for Box<str> {
+    type Error = InvalidFragment;
+
+    fn append(self, to_path: &mut InternalPath) -> Result<(), Self::Error> {
+        match Fragment::try_new(self)?.append(to_path) {
+            Ok(()) => Ok(()),
+            Err(impossible) => match impossible {},
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::InternalPath;
 
     #[test]
     fn eq_index() {
-        let left = InternalPath::parse("langs/div-prt/phonology").unwrap();
-        let right =
-            InternalPath::parse("langs/div-prt/phonology/index.html").unwrap();
+        let left = InternalPath::parse("langs/div-prt/phonology");
+        let right = InternalPath::parse("langs/div-prt/phonology/index.html");
         assert!(left.eq_index(&right));
         assert!(right.eq_index(&left));
     }

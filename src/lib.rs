@@ -98,12 +98,12 @@
 //!         children: harray![
 //!             Section {
 //!                 title: "Random Section",
-//!                 id: Some(Id::new("random").unwrap()),
+//!                 id: Some(Id::new("random")),
 //!                 body: Paragraph("This is a random paragraph."),
 //!                 children: harray![
 //!                     Section {
 //!                         title: "Randomly First",
-//!                         id: Some(Id::new("random-first").unwrap()),
+//!                         id: Some(Id::new("random-first")),
 //!                         body: Paragraph(
 //!                             "This the first (really?) random paragraph."
 //!                         ),
@@ -111,7 +111,7 @@
 //!                     },
 //!                     Section {
 //!                         title: "Randomly Second",
-//!                         id: Some(Id::new("random-second").unwrap()),
+//!                         id: Some(Id::new("random-second")),
 //!                         body: Paragraph(
 //!                             "This the second (really??) random paragraph."
 //!                         ),
@@ -121,7 +121,7 @@
 //!             },
 //!             Section {
 //!                 title: "Weird Title",
-//!                 id: Some(Id::new("weird").unwrap()),
+//!                 id: Some(Id::new("weird")),
 //!                 body: Paragraph("Weird paragraph as an example"),
 //!                 children: harray![],
 //!             }
@@ -172,19 +172,19 @@
 //!     site.root
 //!         .insert_index(InternalPath::root(), Entry::Page(index().into_dyn()));
 //!     site.root.insert_index(
-//!         InternalPath::parse("foo").unwrap(),
+//!         InternalPath::parse("foo"),
 //!         Entry::Page(foo_page().into_dyn()),
 //!     );
 //!     site.root.insert_index(
-//!         InternalPath::parse("bar").unwrap(),
+//!         InternalPath::parse("bar"),
 //!         Entry::Page(bar_page().into_dyn()),
 //!     );
 //!     site.root.insert_index(
-//!         InternalPath::parse("bar/baz").unwrap(),
+//!         InternalPath::parse("bar/baz"),
 //!         Entry::Page(baz_page().into_dyn()),
 //!     );
 //!     site.root.insert_path(
-//!         &InternalPath::parse("styles/main.css").unwrap(),
+//!         &InternalPath::parse("styles/main.css"),
 //!         Entry::Resource,
 //!     );
 //!     site
