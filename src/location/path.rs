@@ -1,4 +1,4 @@
-use super::component::{AsComponent, Component, InvalidComponent};
+use super::component::{AsComponent, InvalidComponent};
 use std::{
     error::Error,
     fmt,
@@ -68,7 +68,7 @@ where
 
     pub fn parse<'input>(input: &'input str) -> Result<Self, InvalidPath>
     where
-        C: TryFrom<&'input str, Error = InvalidComponent> + 'input,
+        C: TryFrom<&'input str, Error = InvalidComponent>,
     {
         let mut this = Self::ROOT;
 
@@ -84,7 +84,7 @@ where
 
 impl<'input, C> TryFrom<&'input str> for PathBuf<C>
 where
-    C: AsComponent + TryFrom<&'input str, Error = InvalidComponent> + 'input,
+    C: AsComponent + TryFrom<&'input str, Error = InvalidComponent>,
 {
     type Error = InvalidPath;
 
@@ -179,7 +179,7 @@ where
 {
     pub fn parse<'input>(input: &'input str) -> Result<Self, InvalidPath>
     where
-        C: TryFrom<&'input str, Error = InvalidComponent> + 'input,
+        C: TryFrom<&'input str, Error = InvalidComponent>,
     {
         let mut builder = ArrayBuilder::new();
 
@@ -195,7 +195,7 @@ where
 
 impl<'input, C, const N: usize> TryFrom<&'input str> for ArrayPath<C, N>
 where
-    C: AsComponent + TryFrom<&'input str, Error = InvalidComponent> + 'input,
+    C: AsComponent + TryFrom<&'input str, Error = InvalidComponent>,
 {
     type Error = InvalidPath;
 

@@ -1,6 +1,34 @@
 use std::{rc::Rc, sync::Arc};
+use url::Url;
 
-pub use url::Url as External;
+pub type InvalidExternal = url::ParseError;
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct External {
+    pub url: Url,
+}
+
+impl External {
+    pub fn parse(input: &str) -> Result<Self, InvalidExternal> {
+        Ok(Self { url: Url::parse(input)? })
+    }
+}
+
+impl<'input> TryFrom<&'input str> for External {
+    type Error = InvalidExternal;
+
+    fn try_from(input: &'input str) -> Result<Self, Self::Error> {
+        Self::parse(input)
+    }
+}
+
+impl TryFrom<Box<str>> for External {
+    type Error = InvalidExternal;
+
+    fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
+        Self::parse(&input[..])
+    }
+}
 
 pub trait AsExternal {
     fn as_external(&self) -> &External;
