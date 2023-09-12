@@ -71,6 +71,22 @@ impl Id {
     }
 }
 
+impl<'input> TryFrom<&'input str> for &'input Id {
+    type Error = InvalidId;
+
+    fn try_from(input: &'input str) -> Result<Self, Self::Error> {
+        Id::parse(input)
+    }
+}
+
+impl TryFrom<Box<str>> for Box<Id> {
+    type Error = InvalidId;
+
+    fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
+        Id::parse_owned(input)
+    }
+}
+
 pub trait AsId {
     fn as_id(&self) -> &Id;
 }
