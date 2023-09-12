@@ -1,4 +1,4 @@
-use std::{error::Error, fmt, mem, rc::Rc, sync::Arc};
+use std::{error::Error, fmt, mem};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InvalidId {
@@ -36,24 +36,6 @@ pub struct Id {
 
 impl Id {
     pub fn parse(input: &str) -> Result<&Self, InvalidId> {
-        Self::check_parse_input(input)?;
-        Ok(Self::from_ref(input))
-    }
-
-    pub fn parse_owned(input: Box<str>) -> Result<Box<Self>, InvalidId> {
-        Self::check_parse_input(input.as_ref())?;
-        Ok(Self::from_box(input))
-    }
-
-    fn from_ref(input: &str) -> &Self {
-        unsafe { mem::transmute(input) }
-    }
-
-    fn from_box(input: Box<str>) -> Box<Self> {
-        unsafe { mem::transmute(input) }
-    }
-
-    fn check_parse_input(input: &str) -> Result<(), InvalidId> {
         let mut iter = input.chars();
 
         let ch = iter.next().ok_or(InvalidId::Empty)?;
@@ -67,7 +49,20 @@ impl Id {
             }
         }
 
-        Ok(())
+        Ok(Self::from_ref_unchecked(input))
+    }
+
+    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidId> {
+        Self::parse(input.as_ref())?;
+        Ok(Self::from_box_unchecked(input))
+    }
+
+    pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
+        unsafe { mem::transmute(input) }
+    }
+
+    pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
+        unsafe { mem::transmute(input) }
     }
 }
 
@@ -83,52 +78,6 @@ impl TryFrom<Box<str>> for Box<Id> {
     type Error = InvalidId;
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
-        Id::parse_owned(input)
-    }
-}
-
-pub trait AsId {
-    fn as_id(&self) -> &Id;
-}
-
-impl AsId for Id {
-    fn as_id(&self) -> &Id {
-        self
-    }
-}
-
-impl<'this, I> AsId for &'this I
-where
-    I: AsId + ?Sized,
-{
-    fn as_id(&self) -> &Id {
-        (**self).as_id()
-    }
-}
-
-impl<I> AsId for Box<I>
-where
-    I: AsId + ?Sized,
-{
-    fn as_id(&self) -> &Id {
-        (**self).as_id()
-    }
-}
-
-impl<I> AsId for Rc<I>
-where
-    I: AsId + ?Sized,
-{
-    fn as_id(&self) -> &Id {
-        (**self).as_id()
-    }
-}
-
-impl<I> AsId for Arc<I>
-where
-    I: AsId + ?Sized,
-{
-    fn as_id(&self) -> &Id {
-        (**self).as_id()
+        Id::parse_boxed(input)
     }
 }

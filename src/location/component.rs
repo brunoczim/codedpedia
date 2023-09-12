@@ -1,4 +1,4 @@
-use std::{error::Error, fmt, mem, rc::Rc, sync::Arc};
+use std::{error::Error, fmt, mem};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InvalidComponent {
@@ -42,24 +42,6 @@ pub struct Component {
 
 impl Component {
     pub fn parse(input: &str) -> Result<&Self, InvalidComponent> {
-        Self::check_parse_input(input)?;
-        Ok(Self::from_ref(input))
-    }
-
-    pub fn parse_owned(input: Box<str>) -> Result<Box<Self>, InvalidComponent> {
-        Self::check_parse_input(input.as_ref())?;
-        Ok(Self::from_box(input))
-    }
-
-    fn from_ref(input: &str) -> &Self {
-        unsafe { mem::transmute(input) }
-    }
-
-    fn from_box(input: Box<str>) -> Box<Self> {
-        unsafe { mem::transmute(input) }
-    }
-
-    fn check_parse_input(input: &str) -> Result<(), InvalidComponent> {
         if input.is_empty() {
             Err(InvalidComponent::Empty)?;
         }
@@ -79,7 +61,20 @@ impl Component {
             }
         }
 
-        Ok(())
+        Ok(Self::from_ref_unchecked(input))
+    }
+
+    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidComponent> {
+        Self::parse(input.as_ref())?;
+        Ok(Self::from_box_unchecked(input))
+    }
+
+    pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
+        unsafe { mem::transmute(input) }
+    }
+
+    pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
+        unsafe { mem::transmute(input) }
     }
 }
 
@@ -95,52 +90,6 @@ impl TryFrom<Box<str>> for Box<Component> {
     type Error = InvalidComponent;
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
-        Component::parse_owned(input)
-    }
-}
-
-pub trait AsComponent {
-    fn as_component(&self) -> &Component;
-}
-
-impl AsComponent for Component {
-    fn as_component(&self) -> &Component {
-        self
-    }
-}
-
-impl<'this, C> AsComponent for &'this C
-where
-    C: AsComponent + ?Sized,
-{
-    fn as_component(&self) -> &Component {
-        (**self).as_component()
-    }
-}
-
-impl<C> AsComponent for Box<C>
-where
-    C: AsComponent + ?Sized,
-{
-    fn as_component(&self) -> &Component {
-        (**self).as_component()
-    }
-}
-
-impl<C> AsComponent for Rc<C>
-where
-    C: AsComponent + ?Sized,
-{
-    fn as_component(&self) -> &Component {
-        (**self).as_component()
-    }
-}
-
-impl<C> AsComponent for Arc<C>
-where
-    C: AsComponent + ?Sized,
-{
-    fn as_component(&self) -> &Component {
-        (**self).as_component()
+        Component::parse_boxed(input)
     }
 }

@@ -1,16 +1,9 @@
-use super::component::{AsComponent, InvalidComponent};
-use std::{
-    error::Error,
-    fmt,
-    mem::{self, MaybeUninit},
-    rc::Rc,
-    sync::Arc,
-};
+use super::component::{Component, InvalidComponent};
+use std::{error::Error, fmt, mem, str};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InvalidPath {
-    PathToBig { buf_len: usize },
-    PathToSmall { buf_len: usize },
+    MissingInitialBar,
     InvalidComponent(InvalidComponent),
 }
 
@@ -23,19 +16,8 @@ impl From<InvalidComponent> for InvalidPath {
 impl fmt::Display for InvalidPath {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::PathToBig { buf_len } => {
-                write!(
-                    fmtr,
-                    "path is too big for the given buffer of exact length {}",
-                    buf_len
-                )
-            },
-            Self::PathToSmall { buf_len } => {
-                write!(
-                    fmtr,
-                    "path is too small for the given buffer of exact length {}",
-                    buf_len
-                )
+            Self::MissingInitialBar => {
+                write!(fmtr, "missing initial bar '/' in path")
             },
             Self::InvalidComponent(error) => fmt::Display::fmt(error, fmtr),
         }
@@ -45,299 +27,92 @@ impl fmt::Display for InvalidPath {
 impl Error for InvalidPath {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
-            Self::PathToBig { buf_len: _ } => None,
-            Self::PathToSmall { buf_len: _ } => None,
+            Self::MissingInitialBar => None,
             Self::InvalidComponent(error) => Some(error),
         }
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct PathBuf<C>
-where
-    C: AsComponent,
-{
-    pub components: Vec<C>,
-}
-
-impl<C> PathBuf<C>
-where
-    C: AsComponent,
-{
-    pub const ROOT: Self = Self { components: Vec::new() };
-
-    pub fn parse<'input>(input: &'input str) -> Result<Self, InvalidPath>
-    where
-        C: TryFrom<&'input str, Error = InvalidComponent>,
-    {
-        let mut this = Self::ROOT;
-
-        if !input.is_empty() {
-            for component_str in input.split('/') {
-                this.components.push(C::try_from(component_str)?);
-            }
-        }
-
-        Ok(this)
-    }
-}
-
-impl<'input, C> TryFrom<&'input str> for PathBuf<C>
-where
-    C: AsComponent + TryFrom<&'input str, Error = InvalidComponent>,
-{
-    type Error = InvalidPath;
-
-    fn try_from(input: &'input str) -> Result<Self, Self::Error> {
-        Self::parse(input)
-    }
-}
-
-#[derive(Debug)]
-struct ArrayBuilder<C, const N: usize>
-where
-    C: AsComponent,
-{
-    valid_len: usize,
-    components: [MaybeUninit<C>; N],
-}
-
-impl<C, const N: usize> ArrayBuilder<C, N>
-where
-    C: AsComponent,
-{
-    fn new() -> Self {
-        unsafe {
-            let components = MaybeUninit::uninit().assume_init();
-            Self { valid_len: 0, components }
-        }
-    }
-
-    fn push(&mut self, component: C) -> Result<(), InvalidPath> {
-        let index = self.valid_len;
-        match self.components.get_mut(index) {
-            Some(element) => {
-                unsafe {
-                    element.as_mut_ptr().write(component);
-                }
-                self.valid_len += 1;
-                Ok(())
-            },
-            None => Err(InvalidPath::PathToBig { buf_len: N }),
-        }
-    }
-
-    fn finish(mut self) -> Result<ArrayPath<C, N>, InvalidPath> {
-        if self.valid_len == N {
-            self.valid_len = 0;
-            unsafe {
-                let components_raw = mem::replace(
-                    &mut self.components,
-                    MaybeUninit::uninit().assume_init(),
-                );
-                let components = components_raw.map(|comp| comp.assume_init());
-                Ok(ArrayPath { components })
-            }
-        } else {
-            Err(InvalidPath::PathToSmall { buf_len: N })
-        }
-    }
-}
-
-impl<C, const N: usize> Drop for ArrayBuilder<C, N>
-where
-    C: AsComponent,
-{
-    fn drop(&mut self) {
-        for element in &mut self.components[..] {
-            unsafe {
-                element.as_mut_ptr().drop_in_place();
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(transparent)]
-pub struct ArrayPath<C, const N: usize>
-where
-    C: AsComponent,
-{
-    pub components: [C; N],
-}
-
-impl<C> ArrayPath<C, 0>
-where
-    C: AsComponent,
-{
-    pub const ROOT: Self = Self { components: [] };
-}
-
-impl<C, const N: usize> ArrayPath<C, N>
-where
-    C: AsComponent,
-{
-    pub fn parse<'input>(input: &'input str) -> Result<Self, InvalidPath>
-    where
-        C: TryFrom<&'input str, Error = InvalidComponent>,
-    {
-        let mut builder = ArrayBuilder::new();
-
-        if !input.is_empty() {
-            for compomnent_str in input.split('/') {
-                builder.push(C::try_from(compomnent_str)?)?;
-            }
-        }
-
-        builder.finish()
-    }
-}
-
-impl<'input, C, const N: usize> TryFrom<&'input str> for ArrayPath<C, N>
-where
-    C: AsComponent + TryFrom<&'input str, Error = InvalidComponent>,
-{
-    type Error = InvalidPath;
-
-    fn try_from(input: &'input str) -> Result<Self, Self::Error> {
-        Self::parse(input)
-    }
-}
-
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
-pub struct Path<C>
-where
-    C: AsComponent,
-{
-    pub components: [C],
+pub struct Path {
+    contents: str,
 }
 
-impl<C> Path<C>
-where
-    C: AsComponent + 'static,
-{
-    pub const ROOT: &Self = Self::new(&[]);
-}
+impl Path {
+    pub const ROOT: &Self = Self::from_ref_unchecked("/");
 
-impl<C> Path<C>
-where
-    C: AsComponent,
-{
-    pub const fn new(components: &[C]) -> &Self {
-        unsafe { mem::transmute(components) }
+    pub fn parse(input: &str) -> Result<&Self, InvalidPath> {
+        let stripped =
+            input.strip_prefix("/").ok_or(InvalidPath::MissingInitialBar)?;
+
+        for component_str in stripped.split('/') {
+            Component::parse(component_str)?;
+        }
+
+        Ok(Self::from_ref_unchecked(input))
     }
 
-    pub fn new_mut(components: &mut [C]) -> &mut Self {
-        unsafe { mem::transmute(components) }
+    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidPath> {
+        Self::parse(input.as_ref())?;
+        Ok(Self::from_box_uncheckedd(input))
     }
 
-    pub const fn new_boxed(components: Box<[C]>) -> Box<Self> {
-        unsafe { mem::transmute(components) }
+    pub fn components(&self) -> Components {
+        let mut inner = self.contents.split('/');
+        inner.next();
+        Components { inner }
     }
-}
 
-pub trait AsPath {
-    type Component: AsComponent;
+    pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
+        unsafe { mem::transmute(input) }
+    }
 
-    fn as_path(&self) -> &Path<Self::Component>;
-}
-
-impl<C> AsPath for PathBuf<C>
-where
-    C: AsComponent,
-{
-    type Component = C;
-
-    fn as_path(&self) -> &Path<Self::Component> {
-        Path::new(&self.components[..])
+    pub(crate) const fn from_box_uncheckedd(input: Box<str>) -> Box<Self> {
+        unsafe { mem::transmute(input) }
     }
 }
 
-impl<C, const N: usize> AsPath for ArrayPath<C, N>
-where
-    C: AsComponent,
-{
-    type Component = C;
+impl<'input> TryFrom<&'input str> for &'input Path {
+    type Error = InvalidPath;
 
-    fn as_path(&self) -> &Path<Self::Component> {
-        Path::new(&self.components[..])
+    fn try_from(input: &'input str) -> Result<Self, Self::Error> {
+        Path::parse(input)
     }
 }
 
-impl<C, const N: usize> AsPath for [C; N]
-where
-    C: AsComponent,
-{
-    type Component = C;
+impl TryFrom<Box<str>> for Box<Path> {
+    type Error = InvalidPath;
 
-    fn as_path(&self) -> &Path<Self::Component> {
-        Path::new(&self[..])
+    fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
+        Path::parse_boxed(input)
     }
 }
 
-impl<'path, C> AsPath for &'path [C]
-where
-    C: AsComponent,
-{
-    type Component = C;
+impl<'path> IntoIterator for &'path Path {
+    type Item = &'path Component;
+    type IntoIter = Components<'path>;
 
-    fn as_path(&self) -> &Path<Self::Component> {
-        Path::new(&self[..])
+    fn into_iter(self) -> Self::IntoIter {
+        self.components()
     }
 }
 
-impl<C> AsPath for Path<C>
-where
-    C: AsComponent,
-{
-    type Component = C;
+#[derive(Debug, Clone)]
+pub struct Components<'path> {
+    inner: str::Split<'path, char>,
+}
 
-    fn as_path(&self) -> &Path<Self::Component> {
-        self
+impl<'path> Iterator for Components<'path> {
+    type Item = &'path Component;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.inner.next().map(Component::from_ref_unchecked)
     }
 }
 
-impl<'this, P> AsPath for &'this P
-where
-    P: AsPath + ?Sized,
-{
-    type Component = P::Component;
-
-    fn as_path(&self) -> &Path<Self::Component> {
-        (**self).as_path()
-    }
-}
-
-impl<P> AsPath for Box<P>
-where
-    P: AsPath + ?Sized,
-{
-    type Component = P::Component;
-
-    fn as_path(&self) -> &Path<Self::Component> {
-        (**self).as_path()
-    }
-}
-
-impl<P> AsPath for Rc<P>
-where
-    P: AsPath + ?Sized,
-{
-    type Component = P::Component;
-
-    fn as_path(&self) -> &Path<Self::Component> {
-        (**self).as_path()
-    }
-}
-
-impl<P> AsPath for Arc<P>
-where
-    P: AsPath + ?Sized,
-{
-    type Component = P::Component;
-
-    fn as_path(&self) -> &Path<Self::Component> {
-        (**self).as_path()
+impl<'path> DoubleEndedIterator for Components<'path> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.inner.next_back().map(Component::from_ref_unchecked)
     }
 }
