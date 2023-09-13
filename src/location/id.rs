@@ -57,6 +57,10 @@ impl Id {
         Ok(Self::from_box_unchecked(input))
     }
 
+    pub fn raw_contents(&self) -> &str {
+        &self.contents
+    }
+
     pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
         unsafe { mem::transmute(input) }
     }
@@ -79,5 +83,11 @@ impl TryFrom<Box<str>> for Box<Id> {
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
         Id::parse_boxed(input)
+    }
+}
+
+impl AsRef<Self> for Id {
+    fn as_ref(&self) -> &Self {
+        self
     }
 }

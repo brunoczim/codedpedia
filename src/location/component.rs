@@ -69,6 +69,10 @@ impl Component {
         Ok(Self::from_box_unchecked(input))
     }
 
+    pub fn raw_contents(&self) -> &str {
+        &self.contents
+    }
+
     pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
         unsafe { mem::transmute(input) }
     }
@@ -91,5 +95,11 @@ impl TryFrom<Box<str>> for Box<Component> {
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
         Component::parse_boxed(input)
+    }
+}
+
+impl AsRef<Self> for Component {
+    fn as_ref(&self) -> &Self {
+        self
     }
 }
