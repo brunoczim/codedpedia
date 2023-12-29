@@ -1,5 +1,5 @@
 use super::{
-    component::InvalidComponent,
+    component::{Component, InvalidComponent},
     id::{Id, InvalidId},
 };
 
@@ -37,16 +37,16 @@ impl StrExt for str {
     }
 
     fn try_into_id(self: Box<Self>) -> Result<Box<Id>, InvalidId> {
-        Id::parse_owned(self)
+        Id::parse_boxed(self)
     }
 
-    fn try_component(&self) -> Result<&Component, InvalcomponentComponent> {
+    fn try_component(&self) -> Result<&Component, InvalidComponent> {
         Component::parse(self)
     }
 
     fn try_into_component(
         self: Box<Self>,
-    ) -> Result<Box<Component>, InvalcomponentComponent> {
-        Component::parse_owned(self)
+    ) -> Result<Box<Component>, InvalidComponent> {
+        Component::parse_boxed(self)
     }
 }

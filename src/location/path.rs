@@ -35,7 +35,7 @@ pub struct Path {
 }
 
 impl Path {
-    pub const ROOT: &Self = Self::from_ref_unchecked("");
+    pub const ROOT: &'static Self = Self::from_ref_unchecked("");
 
     pub fn parse(input: &str) -> Result<&Self, InvalidPath> {
         if !input.is_empty() {

@@ -2,9 +2,9 @@ use std::{error::Error, fmt};
 
 use super::{
     external::{AsExternal, InvalidExternal},
-    id::{AsId, InvalidId},
+    id::{Id, InvalidId},
     internal::{Internal, InvalidInternal},
-    path::{AsPath, InvalidPath},
+    path::{InvalidPath, Path},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -39,8 +39,8 @@ impl Error for InvalidLocation {}
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Location<I, P, E>
 where
-    I: AsId,
-    P: AsPath,
+    I: AsRef<Id>,
+    P: AsRef<Path>,
     E: AsExternal,
 {
     Internal(Internal<I, P>),
@@ -49,8 +49,8 @@ where
 
 impl<I, P, E> Location<I, P, E>
 where
-    I: AsId,
-    P: AsPath,
+    I: AsRef<Id>,
+    P: AsRef<Path>,
     E: AsExternal,
 {
     pub fn parse<'input>(input: &'input str) -> Result<Self, InvalidLocation>
@@ -69,8 +69,8 @@ where
 
 impl<'input, I, P, E> TryFrom<&'input str> for Location<I, P, E>
 where
-    I: AsId + TryFrom<&'input str, Error = InvalidId>,
-    P: AsPath + TryFrom<&'input str, Error = InvalidPath>,
+    I: AsRef<Id> + TryFrom<&'input str, Error = InvalidId>,
+    P: AsRef<Path> + TryFrom<&'input str, Error = InvalidPath>,
     E: AsExternal + TryFrom<&'input str, Error = InvalidExternal>,
 {
     type Error = InvalidLocation;

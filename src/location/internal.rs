@@ -1,6 +1,6 @@
 use super::{
-    id::{AsId, InvalidId},
-    path::{AsPath, InvalidPath},
+    id::{Id, InvalidId},
+    path::{InvalidPath, Path},
 };
 use std::{error::Error, fmt};
 
@@ -36,8 +36,8 @@ impl Error for InvalidInternal {}
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Internal<I, P>
 where
-    I: AsId,
-    P: AsPath,
+    I: AsRef<Id>,
+    P: AsRef<Path>,
 {
     Id(I),
     Path(P),
@@ -46,8 +46,8 @@ where
 
 impl<I, P> Internal<I, P>
 where
-    I: AsId,
-    P: AsPath,
+    I: AsRef<Id>,
+    P: AsRef<Path>,
 {
     pub fn parse<'input>(input: &'input str) -> Result<Self, InvalidInternal>
     where
@@ -76,8 +76,8 @@ where
 
 impl<'input, I, P> TryFrom<&'input str> for Internal<I, P>
 where
-    I: AsId + TryFrom<&'input str, Error = InvalidId>,
-    P: AsPath + TryFrom<&'input str, Error = InvalidPath>,
+    I: AsRef<Id> + TryFrom<&'input str, Error = InvalidId>,
+    P: AsRef<Path> + TryFrom<&'input str, Error = InvalidPath>,
 {
     type Error = InvalidInternal;
 
