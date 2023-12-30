@@ -227,3 +227,89 @@ impl Deref for PathBuf {
         self.as_path()
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::location::component::Component;
+
+    use super::Path;
+
+    #[test]
+    fn valid_root() {
+        let path0 = Path::parse("").unwrap();
+        let path1 = Path::ROOT;
+
+        assert_eq!(path0, path1);
+        assert_eq!(path0.raw_contents(), "");
+        assert_eq!(path1.raw_contents(), "");
+    }
+
+    #[test]
+    fn valid_single_alphanumeric() {
+        let path = Path::parse("hell0").unwrap();
+        assert_eq!(path.raw_contents(), "hell0");
+    }
+
+    #[test]
+    fn valid_slug() {
+        let path = Path::parse("hello-world/foo-bar").unwrap();
+        assert_eq!(path.raw_contents(), "hello-world/foo-bar");
+    }
+
+    #[test]
+    fn valid_with_spaces_and_punct() {
+        let path = Path::parse("Hello, world!/test/done").unwrap();
+        assert_eq!(path.raw_contents(), "Hello, world!/test/done");
+    }
+
+    #[test]
+    fn invalid_hash() {
+        Path::parse("ha#he").unwrap_err();
+    }
+
+    #[test]
+    fn iter_root() {
+        let expected: Vec<&Component> = Vec::new();
+        let actual = Path::ROOT.into_iter().collect::<Vec<_>>();
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn iter_single() {
+        let expected: Vec<&Component> = vec![Component::parse("bl0g").unwrap()];
+        let actual =
+            Path::parse("bl0g").unwrap().into_iter().collect::<Vec<_>>();
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn iter_two() {
+        let expected: Vec<&Component> = vec![
+            Component::parse("bl0g").unwrap(),
+            Component::parse("new-post").unwrap(),
+        ];
+        let actual = Path::parse("bl0g/new-post")
+            .unwrap()
+            .into_iter()
+            .collect::<Vec<_>>();
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn iter_three() {
+        let expected: Vec<&Component> = vec![
+            Component::parse("bl0g").unwrap(),
+            Component::parse("new-post").unwrap(),
+            Component::parse("actual").unwrap(),
+        ];
+        let actual = Path::parse("bl0g/new-post/actual")
+            .unwrap()
+            .into_iter()
+            .collect::<Vec<_>>();
+
+        assert_eq!(expected, actual);
+    }
+}

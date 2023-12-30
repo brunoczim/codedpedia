@@ -91,3 +91,35 @@ impl AsRef<Self> for Id {
         self
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::Id;
+
+    #[test]
+    fn valid_alphanumeric() {
+        let id = Id::parse("hell0").unwrap();
+        assert_eq!(id.raw_contents(), "hell0");
+    }
+
+    #[test]
+    fn valid_slug() {
+        let id = Id::parse("hello-world_yahoo").unwrap();
+        assert_eq!(id.raw_contents(), "hello-world_yahoo");
+    }
+
+    #[test]
+    fn invalid_space() {
+        Id::parse("h a").unwrap_err();
+    }
+
+    #[test]
+    fn invalid_bar() {
+        Id::parse("ha/he").unwrap_err();
+    }
+
+    #[test]
+    fn invalid_hash() {
+        Id::parse("ha#he").unwrap_err();
+    }
+}

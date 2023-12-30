@@ -103,3 +103,36 @@ impl AsRef<Self> for Component {
         self
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::Component;
+
+    #[test]
+    fn valid_alphanumeric() {
+        let component = Component::parse("hell0").unwrap();
+        assert_eq!(component.raw_contents(), "hell0");
+    }
+
+    #[test]
+    fn valid_slug() {
+        let component = Component::parse("hello-world").unwrap();
+        assert_eq!(component.raw_contents(), "hello-world");
+    }
+
+    #[test]
+    fn valid_with_spaces_and_punct() {
+        let component = Component::parse("Hello, world!").unwrap();
+        assert_eq!(component.raw_contents(), "Hello, world!");
+    }
+
+    #[test]
+    fn invalid_bar() {
+        Component::parse("ha/he").unwrap_err();
+    }
+
+    #[test]
+    fn invalid_hash() {
+        Component::parse("ha#he").unwrap_err();
+    }
+}
