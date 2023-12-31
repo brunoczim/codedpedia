@@ -1,8 +1,11 @@
 use std::{error::Error, fmt, mem};
 
 use super::{
+    component::Component,
     external::{External, InvalidExternal},
+    id::Id,
     internal::{Internal, InvalidInternal},
+    path::Path,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -64,12 +67,16 @@ impl Location {
         Ok(Self::from_box_unchecked(input))
     }
 
-    pub fn raw_contents(&self) -> &str {
-        &self.contents
+    pub fn from_curr_page_id(id: &Id) -> Box<Self> {
+        Box::<Self>::from(Internal::from_curr_page_id(id))
     }
 
-    pub fn into_boxed(&self) -> Box<Self> {
+    pub fn to_boxed(&self) -> Box<Self> {
         Self::from_box_unchecked(Box::from(self.raw_contents()))
+    }
+
+    pub fn raw_contents(&self) -> &str {
+        &self.contents
     }
 
     pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
@@ -79,17 +86,70 @@ impl Location {
     pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
         unsafe { mem::transmute(input) }
     }
+
+    #[allow(dead_code)]
+    pub(crate) fn into_boxed_contents(self: Box<Self>) -> Box<str> {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl<'a> From<&'a Component> for &'a Location {
+    fn from(component: &'a Component) -> Self {
+        Self::from(<&Internal>::from(component))
+    }
+}
+
+impl<'a> From<&'a Path> for &'a Location {
+    fn from(path: &'a Path) -> Self {
+        Self::from(<&Internal>::from(path))
+    }
+}
+
+impl<'a> From<&'a Internal> for &'a Location {
+    fn from(internal_loc: &'a Internal) -> Self {
+        Location::from_ref_unchecked(internal_loc.raw_contents())
+    }
+}
+
+impl<'a> From<&'a External> for &'a Location {
+    fn from(external_loc: &'a External) -> Self {
+        Location::from_ref_unchecked(external_loc.raw_contents())
+    }
+}
+
+impl From<Box<Component>> for Box<Location> {
+    fn from(component: Box<Component>) -> Self {
+        Self::from(Box::<Internal>::from(component))
+    }
+}
+
+impl From<Box<Path>> for Box<Location> {
+    fn from(path: Box<Path>) -> Self {
+        Self::from(Box::<Internal>::from(path))
+    }
+}
+
+impl From<Box<Internal>> for Box<Location> {
+    fn from(internal_loc: Box<Internal>) -> Self {
+        Location::from_box_unchecked(internal_loc.into_boxed_contents())
+    }
+}
+
+impl From<Box<External>> for Box<Location> {
+    fn from(external_loc: Box<External>) -> Self {
+        Location::from_box_unchecked(external_loc.into_boxed_contents())
+    }
 }
 
 impl Clone for Box<Location> {
     fn clone(&self) -> Self {
-        self.into_boxed()
+        self.to_boxed()
     }
 }
 
 impl<'a> From<&'a Location> for Box<Location> {
     fn from(reference: &'a Location) -> Self {
-        reference.into_boxed()
+        reference.to_boxed()
     }
 }
 
@@ -131,7 +191,7 @@ impl ToOwned for Location {
     type Owned = Box<Self>;
 
     fn to_owned(&self) -> Self::Owned {
-        self.into_boxed()
+        self.to_boxed()
     }
 }
 

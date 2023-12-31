@@ -52,16 +52,16 @@ impl Path {
         Ok(Self::from_box_unchecked(input))
     }
 
-    pub fn is_root(&self) -> bool {
-        self.contents.is_empty()
+    pub fn to_boxed(&self) -> Box<Self> {
+        Self::from_box_unchecked(Box::from(self.raw_contents()))
     }
 
     pub fn raw_contents(&self) -> &str {
         &self.contents
     }
 
-    pub fn into_boxed(&self) -> Box<Self> {
-        Self::from_box_unchecked(Box::from(self.raw_contents()))
+    pub fn is_root(&self) -> bool {
+        self.contents.is_empty()
     }
 
     pub fn components(&self) -> Components {
@@ -88,17 +88,33 @@ impl Path {
     pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
         unsafe { mem::transmute(input) }
     }
+
+    pub(crate) fn into_boxed_contents(self: Box<Self>) -> Box<str> {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl<'a> From<&'a Component> for &'a Path {
+    fn from(component: &'a Component) -> Self {
+        Path::from_ref_unchecked(component.raw_contents())
+    }
+}
+
+impl From<Box<Component>> for Box<Path> {
+    fn from(component: Box<Component>) -> Self {
+        Path::from_box_unchecked(component.into_boxed_contents())
+    }
 }
 
 impl Clone for Box<Path> {
     fn clone(&self) -> Self {
-        self.into_boxed()
+        self.to_boxed()
     }
 }
 
 impl<'a> From<&'a Path> for Box<Path> {
     fn from(reference: &'a Path) -> Self {
-        reference.into_boxed()
+        reference.to_boxed()
     }
 }
 

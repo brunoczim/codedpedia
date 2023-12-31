@@ -69,12 +69,12 @@ impl Component {
         Ok(Self::from_box_unchecked(input))
     }
 
-    pub fn raw_contents(&self) -> &str {
-        &self.contents
+    pub fn to_boxed(&self) -> Box<Self> {
+        Self::from_box_unchecked(Box::from(self.raw_contents()))
     }
 
-    pub fn into_boxed(&self) -> Box<Self> {
-        Self::from_box_unchecked(Box::from(self.raw_contents()))
+    pub fn raw_contents(&self) -> &str {
+        &self.contents
     }
 
     pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
@@ -84,17 +84,21 @@ impl Component {
     pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
         unsafe { mem::transmute(input) }
     }
+
+    pub(crate) fn into_boxed_contents(self: Box<Self>) -> Box<str> {
+        unsafe { mem::transmute(self) }
+    }
 }
 
 impl Clone for Box<Component> {
     fn clone(&self) -> Self {
-        self.into_boxed()
+        self.to_boxed()
     }
 }
 
 impl<'a> From<&'a Component> for Box<Component> {
     fn from(reference: &'a Component) -> Self {
-        reference.into_boxed()
+        reference.to_boxed()
     }
 }
 
@@ -142,7 +146,7 @@ impl ToOwned for Component {
     type Owned = Box<Self>;
 
     fn to_owned(&self) -> Self::Owned {
-        self.into_boxed()
+        self.to_boxed()
     }
 }
 

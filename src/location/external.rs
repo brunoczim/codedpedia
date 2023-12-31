@@ -79,12 +79,12 @@ impl External {
         Ok(Self::from_box_unchecked(input))
     }
 
-    pub fn raw_contents(&self) -> &str {
-        &self.contents
+    pub fn to_boxed(&self) -> Box<Self> {
+        Self::from_box_unchecked(Box::from(self.raw_contents()))
     }
 
-    pub fn into_boxed(&self) -> Box<Self> {
-        Self::from_box_unchecked(Box::from(self.raw_contents()))
+    pub fn raw_contents(&self) -> &str {
+        &self.contents
     }
 
     pub fn view(&self) -> ViewRef {
@@ -106,17 +106,21 @@ impl External {
     pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
         unsafe { mem::transmute(input) }
     }
+
+    pub(crate) fn into_boxed_contents(self: Box<Self>) -> Box<str> {
+        unsafe { mem::transmute(self) }
+    }
 }
 
 impl Clone for Box<External> {
     fn clone(&self) -> Self {
-        self.into_boxed()
+        self.to_boxed()
     }
 }
 
 impl<'a> From<&'a External> for Box<External> {
     fn from(reference: &'a External) -> Self {
-        reference.into_boxed()
+        reference.to_boxed()
     }
 }
 
@@ -158,7 +162,7 @@ impl ToOwned for External {
     type Owned = Box<Self>;
 
     fn to_owned(&self) -> Self::Owned {
-        self.into_boxed()
+        self.to_boxed()
     }
 }
 

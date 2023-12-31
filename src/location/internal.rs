@@ -77,12 +77,16 @@ impl Internal {
         Ok(Self::from_box_unchecked(input))
     }
 
-    pub fn raw_contents(&self) -> &str {
-        &self.contents
+    pub fn from_curr_page_id(id: &Id) -> Box<Self> {
+        ViewRef::Id(id).to_boxed()
     }
 
-    pub fn into_boxed(&self) -> Box<Self> {
+    pub fn to_boxed(&self) -> Box<Self> {
         Self::from_box_unchecked(Box::from(self.raw_contents()))
+    }
+
+    pub fn raw_contents(&self) -> &str {
+        &self.contents
     }
 
     pub fn view(&self) -> ViewRef {
@@ -114,17 +118,45 @@ impl Internal {
     pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
         unsafe { mem::transmute(input) }
     }
+
+    pub(crate) fn into_boxed_contents(self: Box<Self>) -> Box<str> {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl<'a> From<&'a Component> for &'a Internal {
+    fn from(component: &'a Component) -> Self {
+        Self::from(<&Path>::from(component))
+    }
+}
+
+impl<'a> From<&'a Path> for &'a Internal {
+    fn from(path: &'a Path) -> Self {
+        Internal::from_ref_unchecked(path.raw_contents())
+    }
+}
+
+impl From<Box<Component>> for Box<Internal> {
+    fn from(component: Box<Component>) -> Self {
+        Self::from(Box::<Path>::from(component))
+    }
+}
+
+impl From<Box<Path>> for Box<Internal> {
+    fn from(path: Box<Path>) -> Self {
+        Internal::from_box_unchecked(path.into_boxed_contents())
+    }
 }
 
 impl Clone for Box<Internal> {
     fn clone(&self) -> Self {
-        self.into_boxed()
+        self.to_boxed()
     }
 }
 
 impl<'a> From<&'a Internal> for Box<Internal> {
     fn from(reference: &'a Internal) -> Self {
-        reference.into_boxed()
+        reference.to_boxed()
     }
 }
 
@@ -172,7 +204,7 @@ impl ToOwned for Internal {
     type Owned = Box<Self>;
 
     fn to_owned(&self) -> Self::Owned {
-        self.into_boxed()
+        self.to_boxed()
     }
 }
 
