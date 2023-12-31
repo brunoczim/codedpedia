@@ -1,5 +1,5 @@
 use super::component::{Component, InvalidComponent};
-use std::{error::Error, fmt, mem, ops::Deref, str};
+use std::{borrow::Borrow, error::Error, fmt, mem, ops::Deref, str};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum InvalidPath {
@@ -49,7 +49,7 @@ impl Path {
 
     pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidPath> {
         Self::parse(input.as_ref())?;
-        Ok(Self::from_box_uncheckedd(input))
+        Ok(Self::from_box_unchecked(input))
     }
 
     pub fn is_root(&self) -> bool {
@@ -58,6 +58,10 @@ impl Path {
 
     pub fn raw_contents(&self) -> &str {
         &self.contents
+    }
+
+    pub fn into_boxed(&self) -> Box<Self> {
+        Self::from_box_unchecked(Box::from(self.raw_contents()))
     }
 
     pub fn components(&self) -> Components {
@@ -81,8 +85,26 @@ impl Path {
         unsafe { mem::transmute(input) }
     }
 
-    pub(crate) const fn from_box_uncheckedd(input: Box<str>) -> Box<Self> {
+    pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
         unsafe { mem::transmute(input) }
+    }
+}
+
+impl Clone for Box<Path> {
+    fn clone(&self) -> Self {
+        self.into_boxed()
+    }
+}
+
+impl<'a> From<&'a Path> for Box<Path> {
+    fn from(reference: &'a Path) -> Self {
+        reference.into_boxed()
+    }
+}
+
+impl PartialEq<str> for Path {
+    fn eq(&self, other: &str) -> bool {
+        Self::parse(other).map_or(false, |other| self == other)
     }
 }
 
@@ -129,6 +151,14 @@ impl fmt::Display for Path {
     }
 }
 
+impl ToOwned for Path {
+    type Owned = PathBuf;
+
+    fn to_owned(&self) -> Self::Owned {
+        self.to_buf()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Components<'path> {
     inner: str::Split<'path, char>,
@@ -148,7 +178,7 @@ impl<'path> DoubleEndedIterator for Components<'path> {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct PathBuf {
     contents: String,
 }
@@ -221,6 +251,12 @@ impl<'path> From<&'path Path> for PathBuf {
     }
 }
 
+impl Borrow<Path> for PathBuf {
+    fn borrow(&self) -> &Path {
+        self.as_path()
+    }
+}
+
 impl AsRef<Self> for PathBuf {
     fn as_ref(&self) -> &Self {
         self
@@ -250,6 +286,12 @@ impl Deref for PathBuf {
 
     fn deref(&self) -> &Self::Target {
         self.as_path()
+    }
+}
+
+impl From<PathBuf> for Box<Path> {
+    fn from(buf: PathBuf) -> Self {
+        Path::from_box_unchecked(buf.contents.into())
     }
 }
 

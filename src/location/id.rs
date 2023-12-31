@@ -80,6 +80,18 @@ impl Clone for Box<Id> {
     }
 }
 
+impl<'a> From<&'a Id> for Box<Id> {
+    fn from(reference: &'a Id) -> Self {
+        reference.into_boxed()
+    }
+}
+
+impl PartialEq<str> for Id {
+    fn eq(&self, other: &str) -> bool {
+        Self::parse(other).map_or(false, |other| self == other)
+    }
+}
+
 impl<'input> TryFrom<&'input str> for &'input Id {
     type Error = InvalidId;
 
@@ -111,6 +123,14 @@ impl AsRef<str> for Id {
 impl fmt::Display for Id {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
+impl ToOwned for Id {
+    type Owned = Box<Self>;
+
+    fn to_owned(&self) -> Self::Owned {
+        self.into_boxed()
     }
 }
 

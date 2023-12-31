@@ -114,6 +114,18 @@ impl Clone for Box<External> {
     }
 }
 
+impl<'a> From<&'a External> for Box<External> {
+    fn from(reference: &'a External) -> Self {
+        reference.into_boxed()
+    }
+}
+
+impl PartialEq<str> for External {
+    fn eq(&self, other: &str) -> bool {
+        Self::parse(other).map_or(false, |other| self == other)
+    }
+}
+
 impl<'input> TryFrom<&'input str> for &'input External {
     type Error = InvalidExternal;
 
@@ -139,6 +151,14 @@ impl AsRef<External> for External {
 impl fmt::Display for External {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
+impl ToOwned for External {
+    type Owned = Box<Self>;
+
+    fn to_owned(&self) -> Self::Owned {
+        self.into_boxed()
     }
 }
 

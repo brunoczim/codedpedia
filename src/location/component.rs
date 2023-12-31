@@ -92,6 +92,18 @@ impl Clone for Box<Component> {
     }
 }
 
+impl<'a> From<&'a Component> for Box<Component> {
+    fn from(reference: &'a Component) -> Self {
+        reference.into_boxed()
+    }
+}
+
+impl PartialEq<str> for Component {
+    fn eq(&self, other: &str) -> bool {
+        Self::parse(other).map_or(false, |other| self == other)
+    }
+}
+
 impl<'input> TryFrom<&'input str> for &'input Component {
     type Error = InvalidComponent;
 
@@ -123,6 +135,14 @@ impl AsRef<str> for Component {
 impl fmt::Display for Component {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
+impl ToOwned for Component {
+    type Owned = Box<Self>;
+
+    fn to_owned(&self) -> Self::Owned {
+        self.into_boxed()
     }
 }
 

@@ -81,6 +81,10 @@ impl Internal {
         &self.contents
     }
 
+    pub fn into_boxed(&self) -> Box<Self> {
+        Self::from_box_unchecked(Box::from(self.raw_contents()))
+    }
+
     pub fn view(&self) -> ViewRef {
         match self
             .contents
@@ -103,10 +107,6 @@ impl Internal {
         }
     }
 
-    pub fn into_boxed(&self) -> Box<Self> {
-        Self::from_box_unchecked(Box::from(self.raw_contents()))
-    }
-
     pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
         unsafe { mem::transmute(input) }
     }
@@ -119,6 +119,18 @@ impl Internal {
 impl Clone for Box<Internal> {
     fn clone(&self) -> Self {
         self.into_boxed()
+    }
+}
+
+impl<'a> From<&'a Internal> for Box<Internal> {
+    fn from(reference: &'a Internal) -> Self {
+        reference.into_boxed()
+    }
+}
+
+impl PartialEq<str> for Internal {
+    fn eq(&self, other: &str) -> bool {
+        Self::parse(other).map_or(false, |other| self == other)
     }
 }
 
@@ -153,6 +165,14 @@ impl AsRef<str> for Internal {
 impl fmt::Display for Internal {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
+impl ToOwned for Internal {
+    type Owned = Box<Self>;
+
+    fn to_owned(&self) -> Self::Owned {
+        self.into_boxed()
     }
 }
 

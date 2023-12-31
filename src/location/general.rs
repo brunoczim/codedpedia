@@ -87,6 +87,18 @@ impl Clone for Box<Location> {
     }
 }
 
+impl<'a> From<&'a Location> for Box<Location> {
+    fn from(reference: &'a Location) -> Self {
+        reference.into_boxed()
+    }
+}
+
+impl PartialEq<str> for Location {
+    fn eq(&self, other: &str) -> bool {
+        Self::parse(other).map_or(false, |other| self == other)
+    }
+}
+
 impl<'input> TryFrom<&'input str> for &'input Location {
     type Error = InvalidLocation;
 
@@ -112,6 +124,14 @@ impl AsRef<Location> for Location {
 impl fmt::Display for Location {
     fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
         write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
+impl ToOwned for Location {
+    type Owned = Box<Self>;
+
+    fn to_owned(&self) -> Self::Owned {
+        self.into_boxed()
     }
 }
 
