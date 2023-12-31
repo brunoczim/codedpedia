@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-url = "2.1"
 percent-encoding = "2.1"
 
 [dev-dependencies]
