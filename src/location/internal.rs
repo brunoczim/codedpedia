@@ -122,6 +122,40 @@ impl Clone for Box<Internal> {
     }
 }
 
+impl<'input> TryFrom<&'input str> for &'input Internal {
+    type Error = InvalidInternal;
+
+    fn try_from(input: &'input str) -> Result<Self, Self::Error> {
+        Internal::parse(input)
+    }
+}
+
+impl TryFrom<Box<str>> for Box<Internal> {
+    type Error = InvalidInternal;
+
+    fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
+        Internal::parse_boxed(input)
+    }
+}
+
+impl AsRef<Self> for Internal {
+    fn as_ref(&self) -> &Self {
+        self
+    }
+}
+
+impl AsRef<str> for Internal {
+    fn as_ref(&self) -> &str {
+        self.raw_contents()
+    }
+}
+
+impl fmt::Display for Internal {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum View<P, I>
 where
@@ -139,13 +173,7 @@ where
     I: AsRef<Id>,
 {
     pub fn to_boxed(&self) -> Box<Internal> {
-        let internal_str = match self {
-            Self::Id(id) => format!(".#{}", id.as_ref()),
-            Self::Path(path) => format!("{}", path.as_ref()),
-            Self::PathWithId(path, id) => {
-                format!("{}#{}", path.as_ref(), id.as_ref())
-            },
-        };
+        let internal_str = self.to_string();
         Internal::from_box_unchecked(internal_str.into_boxed_str())
     }
 
@@ -245,6 +273,22 @@ where
         };
 
         id
+    }
+}
+
+impl<P, I> fmt::Display for View<P, I>
+where
+    P: AsRef<Path>,
+    I: AsRef<Id>,
+{
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Id(id) => write!(fmtr, ".#{}", id.as_ref()),
+            Self::Path(path) => write!(fmtr, "{}", path.as_ref()),
+            Self::PathWithId(path, id) => {
+                write!(fmtr, "{}#{}", path.as_ref(), id.as_ref())
+            },
+        }
     }
 }
 

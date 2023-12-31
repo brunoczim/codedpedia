@@ -74,7 +74,7 @@ impl Id {
     }
 }
 
-impl Clone for Box<Component> {
+impl Clone for Box<Id> {
     fn clone(&self) -> Self {
         self.into_boxed()
     }

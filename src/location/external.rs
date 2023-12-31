@@ -1,36 +1,180 @@
-use url::Url;
+use std::{error::Error, fmt, mem};
 
-pub type InvalidExternal = url::ParseError;
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum InvalidExternal {
+    MissingScheme,
+    EmptyScheme,
+    InvalidSchemeStart(char),
+    InvalidSchemeChar(char),
+}
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+impl fmt::Display for InvalidExternal {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::MissingScheme => {
+                write!(fmtr, "missing external location scheme")
+            },
+            Self::EmptyScheme => {
+                write!(fmtr, "external location scheme cannot be empty")
+            },
+            Self::InvalidSchemeStart(ch) => write!(
+                fmtr,
+                "invalid starting character {:?} in external location scheme",
+                ch
+            ),
+            Self::InvalidSchemeChar(ch) => write!(
+                fmtr,
+                "invalid character {:?} in external location scheme",
+                ch
+            ),
+        }
+    }
+}
+
+impl Error for InvalidExternal {}
+
+pub fn parse<'a>(
+    input: &'a str,
+) -> Result<(&'a External, ViewRef<'a>), InvalidExternal> {
+    let (scheme, rest) =
+        input.split_once("://").ok_or(InvalidExternal::MissingScheme)?;
+
+    let mut iter = scheme.chars();
+
+    let ch = iter.next().ok_or(InvalidExternal::EmptyScheme)?;
+    if !ch.is_ascii_alphabetic() {
+        Err(InvalidExternal::InvalidSchemeStart(ch))?;
+    }
+
+    for ch in iter {
+        if !ch.is_ascii_alphanumeric() && ch != '_' && ch != '-' {
+            Err(InvalidExternal::InvalidSchemeChar(ch))?;
+        }
+    }
+
+    let external_loc = External::from_ref_unchecked(input);
+
+    let view = if scheme == "other" {
+        ViewRef::Other(rest)
+    } else {
+        ViewRef::WithHost { scheme, rest }
+    };
+
+    Ok((external_loc, view))
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct External {
-    pub url: Url,
+    contents: str,
 }
 
 impl External {
-    pub fn parse(input: &str) -> Result<Self, InvalidExternal> {
-        Ok(Self { url: Url::parse(input)? })
+    pub fn parse(input: &str) -> Result<&Self, InvalidExternal> {
+        let (external_loc, _) = parse(input)?;
+        Ok(external_loc)
+    }
+
+    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidExternal> {
+        Self::parse(input.as_ref())?;
+        Ok(Self::from_box_unchecked(input))
+    }
+
+    pub fn raw_contents(&self) -> &str {
+        &self.contents
+    }
+
+    pub fn into_boxed(&self) -> Box<Self> {
+        Self::from_box_unchecked(Box::from(self.raw_contents()))
+    }
+
+    pub fn view(&self) -> ViewRef {
+        let Some((scheme, rest)) = self.raw_contents().split_once("://") else {
+            unreachable!()
+        };
+
+        if scheme == "other" {
+            ViewRef::Other(rest)
+        } else {
+            ViewRef::WithHost { scheme, rest }
+        }
+    }
+
+    pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
+        unsafe { mem::transmute(input) }
+    }
+
+    pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
+        unsafe { mem::transmute(input) }
     }
 }
 
-impl<'input> TryFrom<&'input str> for External {
+impl Clone for Box<External> {
+    fn clone(&self) -> Self {
+        self.into_boxed()
+    }
+}
+
+impl<'input> TryFrom<&'input str> for &'input External {
     type Error = InvalidExternal;
 
     fn try_from(input: &'input str) -> Result<Self, Self::Error> {
-        Self::parse(input)
+        External::parse(input)
     }
 }
 
-impl TryFrom<Box<str>> for External {
+impl TryFrom<Box<str>> for Box<External> {
     type Error = InvalidExternal;
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
-        Self::parse(&input[..])
+        External::parse_boxed(input)
     }
 }
 
 impl AsRef<External> for External {
     fn as_ref(&self) -> &External {
         self
+    }
+}
+
+impl fmt::Display for External {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum ViewRef<'a> {
+    WithHost { scheme: &'a str, rest: &'a str },
+    Other(&'a str),
+}
+
+impl<'a> TryFrom<&'a str> for ViewRef<'a> {
+    type Error = InvalidExternal;
+
+    fn try_from(input: &'a str) -> Result<Self, Self::Error> {
+        Self::parse(input)
+    }
+}
+
+impl<'a> ViewRef<'a> {
+    pub fn parse(input: &'a str) -> Result<Self, InvalidExternal> {
+        let (_, view) = parse(input)?;
+        Ok(view)
+    }
+
+    pub fn to_boxed(&self) -> Box<External> {
+        let external_str = self.to_string();
+        External::from_box_unchecked(external_str.into_boxed_str())
+    }
+}
+
+impl<'a> fmt::Display for ViewRef<'a> {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::WithHost { scheme, rest } => {
+                write!(fmtr, "{}://{}", scheme, rest)
+            },
+            Self::Other(rest) => write!(fmtr, "other://{}", rest),
+        }
     }
 }

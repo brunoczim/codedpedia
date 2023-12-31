@@ -1,10 +1,8 @@
-use std::{error::Error, fmt};
+use std::{error::Error, fmt, mem};
 
 use super::{
     external::{External, InvalidExternal},
-    id::{Id, InvalidId},
-    internal::{Internal, InvalidInternal, View},
-    path::{InvalidPath, Path},
+    internal::{Internal, InvalidInternal},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -36,45 +34,118 @@ impl fmt::Display for InvalidLocation {
 
 impl Error for InvalidLocation {}
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Location {
-    Internal(Box<Internal>),
-    External(External),
+pub fn parse<'a>(
+    input: &'a str,
+) -> Result<(&'a Location, ViewRef<'a>), InvalidLocation> {
+    let view = if input.contains("://") {
+        let external = External::parse(input)?;
+        ViewRef::External(external)
+    } else {
+        let internal = Internal::parse(input)?;
+        ViewRef::Internal(internal)
+    };
+    let location = Location::from_ref_unchecked(input);
+    Ok((location, view))
 }
 
-/*
-impl<P, I, E> Location<P, I, E>
-where
-    P: AsRef<Path>,
-    I: AsRef<Id>,
-    E: AsExternal,
-{
-    pub fn parse<'input>(input: &'input str) -> Result<Self, InvalidLocation>
-    where
-        I: TryFrom<&'input str, Error = InvalidId>,
-        P: TryFrom<&'input str, Error = InvalidPath>,
-        E: TryFrom<&'input str, Error = InvalidExternal>,
-    {
-        if input.contains("://") {
-            Ok(Self::External(E::try_from(input)?))
-        } else {
-            Ok(Self::Internal(View::try_from(input)?))
-        }
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Location {
+    contents: str,
+}
+
+impl Location {
+    pub fn parse(input: &str) -> Result<&Self, InvalidLocation> {
+        let (external_loc, _) = parse(input)?;
+        Ok(external_loc)
+    }
+
+    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidLocation> {
+        Self::parse(input.as_ref())?;
+        Ok(Self::from_box_unchecked(input))
+    }
+
+    pub fn raw_contents(&self) -> &str {
+        &self.contents
+    }
+
+    pub fn into_boxed(&self) -> Box<Self> {
+        Self::from_box_unchecked(Box::from(self.raw_contents()))
+    }
+
+    pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
+        unsafe { mem::transmute(input) }
+    }
+
+    pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
+        unsafe { mem::transmute(input) }
     }
 }
-*/
 
-/*
-impl<'input, P, I, E> TryFrom<&'input str> for Location<P, I, E>
-where
-    P: AsRef<Path> + TryFrom<&'input str, Error = InvalidPath>,
-    I: AsRef<Id> + TryFrom<&'input str, Error = InvalidId>,
-    E: AsExternal + TryFrom<&'input str, Error = InvalidExternal>,
-{
+impl Clone for Box<Location> {
+    fn clone(&self) -> Self {
+        self.into_boxed()
+    }
+}
+
+impl<'input> TryFrom<&'input str> for &'input Location {
     type Error = InvalidLocation;
 
     fn try_from(input: &'input str) -> Result<Self, Self::Error> {
+        Location::parse(input)
+    }
+}
+
+impl TryFrom<Box<str>> for Box<Location> {
+    type Error = InvalidLocation;
+
+    fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
+        Location::parse_boxed(input)
+    }
+}
+
+impl AsRef<Location> for Location {
+    fn as_ref(&self) -> &Location {
+        self
+    }
+}
+
+impl fmt::Display for Location {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum ViewRef<'a> {
+    Internal(&'a Internal),
+    External(&'a External),
+}
+
+impl<'a> TryFrom<&'a str> for ViewRef<'a> {
+    type Error = InvalidLocation;
+
+    fn try_from(input: &'a str) -> Result<Self, Self::Error> {
         Self::parse(input)
     }
 }
-*/
+
+impl<'a> ViewRef<'a> {
+    pub fn parse(input: &'a str) -> Result<Self, InvalidLocation> {
+        let (_, view) = parse(input)?;
+        Ok(view)
+    }
+
+    pub fn to_boxed(&self) -> Box<Location> {
+        let location_str = self.to_string();
+        Location::from_box_unchecked(location_str.into_boxed_str())
+    }
+}
+
+impl<'a> fmt::Display for ViewRef<'a> {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Internal(internal) => write!(fmtr, "{}", internal),
+            Self::External(external) => write!(fmtr, "{}", external),
+        }
+    }
+}
