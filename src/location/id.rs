@@ -35,7 +35,7 @@ pub struct Id {
 }
 
 impl Id {
-    pub fn parse(input: &str) -> Result<&Self, InvalidId> {
+    pub fn new(input: &str) -> Result<&Self, InvalidId> {
         let mut iter = input.chars();
 
         let ch = iter.next().ok_or(InvalidId::Empty)?;
@@ -52,8 +52,8 @@ impl Id {
         Ok(Self::from_ref_unchecked(input))
     }
 
-    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidId> {
-        Self::parse(input.as_ref())?;
+    pub fn new_boxed(input: Box<str>) -> Result<Box<Self>, InvalidId> {
+        Self::new(input.as_ref())?;
         Ok(Self::from_box_unchecked(input))
     }
 
@@ -93,7 +93,7 @@ impl<'a> From<&'a Id> for Box<Id> {
 
 impl PartialEq<str> for Id {
     fn eq(&self, other: &str) -> bool {
-        Self::parse(other).map_or(false, |other| self == other)
+        Self::new(other).map_or(false, |other| self == other)
     }
 }
 
@@ -101,7 +101,7 @@ impl<'input> TryFrom<&'input str> for &'input Id {
     type Error = InvalidId;
 
     fn try_from(input: &'input str) -> Result<Self, Self::Error> {
-        Id::parse(input)
+        Id::new(input)
     }
 }
 
@@ -109,7 +109,7 @@ impl TryFrom<Box<str>> for Box<Id> {
     type Error = InvalidId;
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
-        Id::parse_boxed(input)
+        Id::new_boxed(input)
     }
 }
 
@@ -145,28 +145,28 @@ mod test {
 
     #[test]
     fn valid_alphanumeric() {
-        let id = Id::parse("hell0").unwrap();
+        let id = Id::new("hell0").unwrap();
         assert_eq!(id.raw_contents(), "hell0");
     }
 
     #[test]
     fn valid_slug() {
-        let id = Id::parse("hello-world_yahoo").unwrap();
+        let id = Id::new("hello-world_yahoo").unwrap();
         assert_eq!(id.raw_contents(), "hello-world_yahoo");
     }
 
     #[test]
     fn invalid_space() {
-        Id::parse("h a").unwrap_err();
+        Id::new("h a").unwrap_err();
     }
 
     #[test]
     fn invalid_bar() {
-        Id::parse("ha/he").unwrap_err();
+        Id::new("ha/he").unwrap_err();
     }
 
     #[test]
     fn invalid_hash() {
-        Id::parse("ha#he").unwrap_err();
+        Id::new("ha#he").unwrap_err();
     }
 }

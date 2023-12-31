@@ -41,10 +41,10 @@ pub fn parse<'a>(
     input: &'a str,
 ) -> Result<(&'a Location, ViewRef<'a>), InvalidLocation> {
     let view = if input.contains("://") {
-        let external = External::parse(input)?;
+        let external = External::new(input)?;
         ViewRef::External(external)
     } else {
-        let internal = Internal::parse(input)?;
+        let internal = Internal::new(input)?;
         ViewRef::Internal(internal)
     };
     let location = Location::from_ref_unchecked(input);
@@ -57,13 +57,13 @@ pub struct Location {
 }
 
 impl Location {
-    pub fn parse(input: &str) -> Result<&Self, InvalidLocation> {
+    pub fn new(input: &str) -> Result<&Self, InvalidLocation> {
         let (external_loc, _) = parse(input)?;
         Ok(external_loc)
     }
 
-    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidLocation> {
-        Self::parse(input.as_ref())?;
+    pub fn new_boxed(input: Box<str>) -> Result<Box<Self>, InvalidLocation> {
+        Self::new(input.as_ref())?;
         Ok(Self::from_box_unchecked(input))
     }
 
@@ -155,7 +155,7 @@ impl<'a> From<&'a Location> for Box<Location> {
 
 impl PartialEq<str> for Location {
     fn eq(&self, other: &str) -> bool {
-        Self::parse(other).map_or(false, |other| self == other)
+        Self::new(other).map_or(false, |other| self == other)
     }
 }
 
@@ -163,7 +163,7 @@ impl<'input> TryFrom<&'input str> for &'input Location {
     type Error = InvalidLocation;
 
     fn try_from(input: &'input str) -> Result<Self, Self::Error> {
-        Location::parse(input)
+        Location::new(input)
     }
 }
 
@@ -171,7 +171,7 @@ impl TryFrom<Box<str>> for Box<Location> {
     type Error = InvalidLocation;
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
-        Location::parse_boxed(input)
+        Location::new_boxed(input)
     }
 }
 

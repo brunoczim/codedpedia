@@ -93,58 +93,58 @@ pub trait LocationStrExt {
 
 impl LocationStrExt for str {
     fn try_id(&self) -> Result<&Id, InvalidId> {
-        Id::parse(self)
+        Id::new(self)
     }
 
     fn try_component(&self) -> Result<&Component, InvalidComponent> {
-        Component::parse(self)
+        Component::new(self)
     }
 
     fn try_path(&self) -> Result<&Path, InvalidPath> {
-        Path::parse(self)
+        Path::new(self)
     }
 
     fn try_internal_loc(&self) -> Result<&Internal, InvalidInternal> {
-        Internal::parse(self)
+        Internal::new(self)
     }
 
     fn try_external_loc(&self) -> Result<&External, InvalidExternal> {
-        External::parse(self)
+        External::new(self)
     }
 
     fn try_location(&self) -> Result<&Location, InvalidLocation> {
-        Location::parse(self)
+        Location::new(self)
     }
 
     fn try_into_id(self: Box<Self>) -> Result<Box<Id>, InvalidId> {
-        Id::parse_boxed(self)
+        Id::new_boxed(self)
     }
 
     fn try_into_component(
         self: Box<Self>,
     ) -> Result<Box<Component>, InvalidComponent> {
-        Component::parse_boxed(self)
+        Component::new_boxed(self)
     }
 
     fn try_into_path(self: Box<Self>) -> Result<Box<Path>, InvalidPath> {
-        Path::parse_boxed(self)
+        Path::new_boxed(self)
     }
 
     fn try_into_internal_loc(
         self: Box<Self>,
     ) -> Result<Box<Internal>, InvalidInternal> {
-        Internal::parse_boxed(self)
+        Internal::new_boxed(self)
     }
 
     fn try_into_external_loc(
         self: Box<Self>,
     ) -> Result<Box<External>, InvalidExternal> {
-        External::parse_boxed(self)
+        External::new_boxed(self)
     }
 
     fn try_into_location(
         self: Box<Self>,
     ) -> Result<Box<Location>, InvalidLocation> {
-        Location::parse_boxed(self)
+        Location::new_boxed(self)
     }
 }

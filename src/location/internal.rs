@@ -41,17 +41,17 @@ pub fn parse<'a>(
         match input.char_indices().find(|(_, ch)| *ch == '#').map(|(i, _)| i) {
             Some(i) => {
                 let (path_str, id_str) = input.split_at(i);
-                let id = Id::parse(id_str)?;
+                let id = Id::new(id_str)?;
                 if path_str == "." {
                     View::Id(id)
                 } else {
-                    let path = Path::parse(path_str)?;
+                    let path = Path::new(path_str)?;
                     View::PathWithId(path, id)
                 }
             },
 
             None => {
-                let path = Path::parse(input)?;
+                let path = Path::new(input)?;
                 View::Path(path)
             },
         };
@@ -67,12 +67,12 @@ pub struct Internal {
 }
 
 impl Internal {
-    pub fn parse(input: &str) -> Result<&Self, InvalidInternal> {
+    pub fn new(input: &str) -> Result<&Self, InvalidInternal> {
         let (internal_loc, _) = parse(input)?;
         Ok(internal_loc)
     }
 
-    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidInternal> {
+    pub fn new_boxed(input: Box<str>) -> Result<Box<Self>, InvalidInternal> {
         parse(&input[..])?;
         Ok(Self::from_box_unchecked(input))
     }
@@ -162,7 +162,7 @@ impl<'a> From<&'a Internal> for Box<Internal> {
 
 impl PartialEq<str> for Internal {
     fn eq(&self, other: &str) -> bool {
-        Self::parse(other).map_or(false, |other| self == other)
+        Self::new(other).map_or(false, |other| self == other)
     }
 }
 
@@ -170,7 +170,7 @@ impl<'input> TryFrom<&'input str> for &'input Internal {
     type Error = InvalidInternal;
 
     fn try_from(input: &'input str) -> Result<Self, Self::Error> {
-        Internal::parse(input)
+        Internal::new(input)
     }
 }
 
@@ -178,7 +178,7 @@ impl TryFrom<Box<str>> for Box<Internal> {
     type Error = InvalidInternal;
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
-        Internal::parse_boxed(input)
+        Internal::new_boxed(input)
     }
 }
 
@@ -380,7 +380,7 @@ impl ViewBuf {
         &mut self,
         component_str: &str,
     ) -> Result<(), InvalidComponent> {
-        self.push(Component::parse(component_str)?);
+        self.push(Component::new(component_str)?);
         Ok(())
     }
 

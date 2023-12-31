@@ -41,7 +41,7 @@ pub struct Component {
 }
 
 impl Component {
-    pub fn parse(input: &str) -> Result<&Self, InvalidComponent> {
+    pub fn new(input: &str) -> Result<&Self, InvalidComponent> {
         if input.is_empty() {
             Err(InvalidComponent::Empty)?;
         }
@@ -64,8 +64,8 @@ impl Component {
         Ok(Self::from_ref_unchecked(input))
     }
 
-    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidComponent> {
-        Self::parse(input.as_ref())?;
+    pub fn new_boxed(input: Box<str>) -> Result<Box<Self>, InvalidComponent> {
+        Self::new(input.as_ref())?;
         Ok(Self::from_box_unchecked(input))
     }
 
@@ -104,7 +104,7 @@ impl<'a> From<&'a Component> for Box<Component> {
 
 impl PartialEq<str> for Component {
     fn eq(&self, other: &str) -> bool {
-        Self::parse(other).map_or(false, |other| self == other)
+        Self::new(other).map_or(false, |other| self == other)
     }
 }
 
@@ -112,7 +112,7 @@ impl<'input> TryFrom<&'input str> for &'input Component {
     type Error = InvalidComponent;
 
     fn try_from(input: &'input str) -> Result<Self, Self::Error> {
-        Component::parse(input)
+        Component::new(input)
     }
 }
 
@@ -120,7 +120,7 @@ impl TryFrom<Box<str>> for Box<Component> {
     type Error = InvalidComponent;
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
-        Component::parse_boxed(input)
+        Component::new_boxed(input)
     }
 }
 
@@ -156,29 +156,29 @@ mod test {
 
     #[test]
     fn valid_alphanumeric() {
-        let component = Component::parse("hell0").unwrap();
+        let component = Component::new("hell0").unwrap();
         assert_eq!(component.raw_contents(), "hell0");
     }
 
     #[test]
     fn valid_slug() {
-        let component = Component::parse("hello-world").unwrap();
+        let component = Component::new("hello-world").unwrap();
         assert_eq!(component.raw_contents(), "hello-world");
     }
 
     #[test]
     fn valid_with_spaces_and_punct() {
-        let component = Component::parse("Hello, world!").unwrap();
+        let component = Component::new("Hello, world!").unwrap();
         assert_eq!(component.raw_contents(), "Hello, world!");
     }
 
     #[test]
     fn invalid_bar() {
-        Component::parse("ha/he").unwrap_err();
+        Component::new("ha/he").unwrap_err();
     }
 
     #[test]
     fn invalid_hash() {
-        Component::parse("ha#he").unwrap_err();
+        Component::new("ha#he").unwrap_err();
     }
 }

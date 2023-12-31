@@ -69,13 +69,13 @@ pub struct External {
 }
 
 impl External {
-    pub fn parse(input: &str) -> Result<&Self, InvalidExternal> {
+    pub fn new(input: &str) -> Result<&Self, InvalidExternal> {
         let (external_loc, _) = parse(input)?;
         Ok(external_loc)
     }
 
-    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidExternal> {
-        Self::parse(input.as_ref())?;
+    pub fn new_boxed(input: Box<str>) -> Result<Box<Self>, InvalidExternal> {
+        Self::new(input.as_ref())?;
         Ok(Self::from_box_unchecked(input))
     }
 
@@ -126,7 +126,7 @@ impl<'a> From<&'a External> for Box<External> {
 
 impl PartialEq<str> for External {
     fn eq(&self, other: &str) -> bool {
-        Self::parse(other).map_or(false, |other| self == other)
+        Self::new(other).map_or(false, |other| self == other)
     }
 }
 
@@ -134,7 +134,7 @@ impl<'input> TryFrom<&'input str> for &'input External {
     type Error = InvalidExternal;
 
     fn try_from(input: &'input str) -> Result<Self, Self::Error> {
-        External::parse(input)
+        External::new(input)
     }
 }
 
@@ -142,7 +142,7 @@ impl TryFrom<Box<str>> for Box<External> {
     type Error = InvalidExternal;
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
-        External::parse_boxed(input)
+        External::new_boxed(input)
     }
 }
 

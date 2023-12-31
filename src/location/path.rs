@@ -37,18 +37,18 @@ pub struct Path {
 impl Path {
     pub const ROOT: &'static Self = Self::from_ref_unchecked("");
 
-    pub fn parse(input: &str) -> Result<&Self, InvalidPath> {
+    pub fn new(input: &str) -> Result<&Self, InvalidPath> {
         if !input.is_empty() {
             for component_str in input.split('/') {
-                Component::parse(component_str)?;
+                Component::new(component_str)?;
             }
         }
 
         Ok(Self::from_ref_unchecked(input))
     }
 
-    pub fn parse_boxed(input: Box<str>) -> Result<Box<Self>, InvalidPath> {
-        Self::parse(input.as_ref())?;
+    pub fn new_boxed(input: Box<str>) -> Result<Box<Self>, InvalidPath> {
+        Self::new(input.as_ref())?;
         Ok(Self::from_box_unchecked(input))
     }
 
@@ -120,7 +120,7 @@ impl<'a> From<&'a Path> for Box<Path> {
 
 impl PartialEq<str> for Path {
     fn eq(&self, other: &str) -> bool {
-        Self::parse(other).map_or(false, |other| self == other)
+        Self::new(other).map_or(false, |other| self == other)
     }
 }
 
@@ -128,7 +128,7 @@ impl<'input> TryFrom<&'input str> for &'input Path {
     type Error = InvalidPath;
 
     fn try_from(input: &'input str) -> Result<Self, Self::Error> {
-        Path::parse(input)
+        Path::new(input)
     }
 }
 
@@ -136,7 +136,7 @@ impl TryFrom<Box<str>> for Box<Path> {
     type Error = InvalidPath;
 
     fn try_from(input: Box<str>) -> Result<Self, Self::Error> {
-        Path::parse_boxed(input)
+        Path::new_boxed(input)
     }
 }
 
@@ -232,7 +232,7 @@ impl PathBuf {
         &mut self,
         component_str: &str,
     ) -> Result<(), InvalidComponent> {
-        self.push(Component::parse(component_str)?);
+        self.push(Component::new(component_str)?);
         Ok(())
     }
 
@@ -319,7 +319,7 @@ mod test {
 
     #[test]
     fn valid_root() {
-        let path0 = Path::parse("").unwrap();
+        let path0 = Path::new("").unwrap();
         let path1 = Path::ROOT;
 
         assert_eq!(path0, path1);
@@ -329,25 +329,25 @@ mod test {
 
     #[test]
     fn valid_single_alphanumeric() {
-        let path = Path::parse("hell0").unwrap();
+        let path = Path::new("hell0").unwrap();
         assert_eq!(path.raw_contents(), "hell0");
     }
 
     #[test]
     fn valid_slug() {
-        let path = Path::parse("hello-world/foo-bar").unwrap();
+        let path = Path::new("hello-world/foo-bar").unwrap();
         assert_eq!(path.raw_contents(), "hello-world/foo-bar");
     }
 
     #[test]
     fn valid_with_spaces_and_punct() {
-        let path = Path::parse("Hello, world!/test/done").unwrap();
+        let path = Path::new("Hello, world!/test/done").unwrap();
         assert_eq!(path.raw_contents(), "Hello, world!/test/done");
     }
 
     #[test]
     fn invalid_hash() {
-        Path::parse("ha#he").unwrap_err();
+        Path::new("ha#he").unwrap_err();
     }
 
     #[test]
@@ -360,9 +360,8 @@ mod test {
 
     #[test]
     fn iter_single() {
-        let expected: Vec<&Component> = vec![Component::parse("bl0g").unwrap()];
-        let actual =
-            Path::parse("bl0g").unwrap().into_iter().collect::<Vec<_>>();
+        let expected: Vec<&Component> = vec![Component::new("bl0g").unwrap()];
+        let actual = Path::new("bl0g").unwrap().into_iter().collect::<Vec<_>>();
 
         assert_eq!(expected, actual);
     }
@@ -370,13 +369,11 @@ mod test {
     #[test]
     fn iter_two() {
         let expected: Vec<&Component> = vec![
-            Component::parse("bl0g").unwrap(),
-            Component::parse("new-post").unwrap(),
+            Component::new("bl0g").unwrap(),
+            Component::new("new-post").unwrap(),
         ];
-        let actual = Path::parse("bl0g/new-post")
-            .unwrap()
-            .into_iter()
-            .collect::<Vec<_>>();
+        let actual =
+            Path::new("bl0g/new-post").unwrap().into_iter().collect::<Vec<_>>();
 
         assert_eq!(expected, actual);
     }
@@ -384,11 +381,11 @@ mod test {
     #[test]
     fn iter_three() {
         let expected: Vec<&Component> = vec![
-            Component::parse("bl0g").unwrap(),
-            Component::parse("new-post").unwrap(),
-            Component::parse("actual").unwrap(),
+            Component::new("bl0g").unwrap(),
+            Component::new("new-post").unwrap(),
+            Component::new("actual").unwrap(),
         ];
-        let actual = Path::parse("bl0g/new-post/actual")
+        let actual = Path::new("bl0g/new-post/actual")
             .unwrap()
             .into_iter()
             .collect::<Vec<_>>();
