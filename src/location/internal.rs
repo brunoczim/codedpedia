@@ -37,24 +37,22 @@ impl Error for InvalidInternal {}
 pub fn parse<'a>(
     input: &'a str,
 ) -> Result<(&'a Internal, ViewRef<'a>), InvalidInternal> {
-    let view =
-        match input.char_indices().find(|(_, ch)| *ch == '#').map(|(i, _)| i) {
-            Some(i) => {
-                let (path_str, id_str) = input.split_at(i);
-                let id = Id::new(id_str)?;
-                if path_str == "." {
-                    View::Id(id)
-                } else {
-                    let path = Path::new(path_str)?;
-                    View::PathWithId(path, id)
-                }
-            },
+    let view = match input.rsplit_once('#') {
+        Some((path_str, id_str)) => {
+            let id = Id::new(id_str)?;
+            if path_str == "." {
+                View::Id(id)
+            } else {
+                let path = Path::new(path_str)?;
+                View::PathWithId(path, id)
+            }
+        },
 
-            None => {
-                let path = Path::new(input)?;
-                View::Path(path)
-            },
-        };
+        None => {
+            let path = Path::new(input)?;
+            View::Path(path)
+        },
+    };
 
     let internal_loc = Internal::from_ref_unchecked(input);
     Ok((internal_loc, view))
@@ -400,5 +398,47 @@ impl ViewBuf {
     pub fn append_str(self, component_str: &str) -> Self {
         self.try_append_str(component_str)
             .expect("attempt to append invalid component in path")
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::location::{id::Id, internal::View, path::Path};
+
+    #[test]
+    fn valid_path_only() {
+        let (internal_loc, view) = super::parse("xyz/abcd/uv").unwrap();
+        assert_eq!(internal_loc.raw_contents(), "xyz/abcd/uv");
+        assert_eq!(view, View::Path(Path::new("xyz/abcd/uv").unwrap()));
+    }
+
+    #[test]
+    fn valid_id_only() {
+        let (internal_loc, view) = super::parse(".#foo-bar").unwrap();
+        assert_eq!(internal_loc.raw_contents(), ".#foo-bar");
+        assert_eq!(view, View::Id(Id::new("foo-bar").unwrap()));
+    }
+
+    #[test]
+    fn valid_path_with_id() {
+        let (internal_loc, view) = super::parse("xyz/jaja#foo-bar").unwrap();
+        assert_eq!(internal_loc.raw_contents(), "xyz/jaja#foo-bar");
+        assert_eq!(
+            view,
+            View::PathWithId(
+                Path::new("xyz/jaja").unwrap(),
+                Id::new("foo-bar").unwrap()
+            )
+        );
+    }
+
+    #[test]
+    fn invalid_id() {
+        super::parse("hello#!").unwrap_err();
+    }
+
+    #[test]
+    fn invalid_path() {
+        super::parse("..#abc").unwrap_err();
     }
 }
