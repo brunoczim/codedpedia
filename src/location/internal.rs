@@ -103,12 +103,22 @@ impl Internal {
         }
     }
 
+    pub fn into_boxed(&self) -> Box<Self> {
+        Self::from_box_unchecked(Box::from(self.raw_contents()))
+    }
+
     pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
         unsafe { mem::transmute(input) }
     }
 
     pub(crate) const fn from_box_unchecked(input: Box<str>) -> Box<Self> {
         unsafe { mem::transmute(input) }
+    }
+}
+
+impl Clone for Box<Internal> {
+    fn clone(&self) -> Self {
+        self.into_boxed()
     }
 }
 

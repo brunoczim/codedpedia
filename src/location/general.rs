@@ -1,9 +1,9 @@
 use std::{error::Error, fmt};
 
 use super::{
-    external::{AsExternal, InvalidExternal},
+    external::{External, InvalidExternal},
     id::{Id, InvalidId},
-    internal::{InvalidInternal, View},
+    internal::{Internal, InvalidInternal, View},
     path::{InvalidPath, Path},
 };
 
@@ -37,14 +37,9 @@ impl fmt::Display for InvalidLocation {
 impl Error for InvalidLocation {}
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Location<P, I, E>
-where
-    P: AsRef<Path>,
-    I: AsRef<Id>,
-    E: AsExternal,
-{
-    Internal(View<P, I>),
-    External(E),
+pub enum Location {
+    Internal(Box<Internal>),
+    External(External),
 }
 
 /*
