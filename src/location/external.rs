@@ -202,3 +202,47 @@ impl<'a> fmt::Display for ViewRef<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::location::external::ViewRef;
+
+    #[test]
+    fn valid_with_host() {
+        let (external_loc, view) =
+            super::parse("https://duckduckgo.com/").unwrap();
+        assert_eq!(external_loc.raw_contents(), "https://duckduckgo.com/");
+        assert_eq!(
+            view,
+            ViewRef::WithHost { scheme: "https", rest: "duckduckgo.com/" }
+        );
+    }
+
+    #[test]
+    fn valid_as_other() {
+        let (external_loc, view) =
+            super::parse("other://urn:isbn:123").unwrap();
+        assert_eq!(external_loc.raw_contents(), "other://urn:isbn:123");
+        assert_eq!(view, ViewRef::Other("urn:isbn:123"));
+    }
+
+    #[test]
+    fn invalid_no_scheme() {
+        super::parse("abcd").unwrap_err();
+    }
+
+    #[test]
+    fn invalid_empty_scheme() {
+        super::parse("://abcd").unwrap_err();
+    }
+
+    #[test]
+    fn invalid_bad_scheme_start() {
+        super::parse(".b://abcd").unwrap_err();
+    }
+
+    #[test]
+    fn invalid_bad_scheme_char() {
+        super::parse("a!b://abcd").unwrap_err();
+    }
+}

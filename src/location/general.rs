@@ -229,3 +229,44 @@ impl<'a> fmt::Display for ViewRef<'a> {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::location::{
+        external::External,
+        general::ViewRef,
+        internal::Internal,
+    };
+
+    #[test]
+    fn valid_internal() {
+        let (location, view) = super::parse("blog/page#id").unwrap();
+        assert_eq!(location.raw_contents(), "blog/page#id");
+        assert_eq!(
+            view,
+            ViewRef::Internal(Internal::new("blog/page#id").unwrap()),
+        );
+    }
+
+    #[test]
+    fn valid_external() {
+        let (location, view) = super::parse("https://duckduckgo.com/").unwrap();
+        assert_eq!(location.raw_contents(), "https://duckduckgo.com/");
+        assert_eq!(
+            view,
+            ViewRef::External(
+                External::new("https://duckduckgo.com/").unwrap()
+            ),
+        );
+    }
+
+    #[test]
+    fn invalid_internal() {
+        super::parse("../page#id").unwrap_err();
+    }
+
+    #[test]
+    fn invalid_external() {
+        super::parse("://page").unwrap_err();
+    }
+}
