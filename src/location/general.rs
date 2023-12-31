@@ -3,7 +3,7 @@ use std::{error::Error, fmt};
 use super::{
     external::{AsExternal, InvalidExternal},
     id::{Id, InvalidId},
-    internal::{Internal, InvalidInternal},
+    internal::{InvalidInternal, View},
     path::{InvalidPath, Path},
 };
 
@@ -37,20 +37,21 @@ impl fmt::Display for InvalidLocation {
 impl Error for InvalidLocation {}
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum Location<I, P, E>
+pub enum Location<P, I, E>
 where
-    I: AsRef<Id>,
     P: AsRef<Path>,
+    I: AsRef<Id>,
     E: AsExternal,
 {
-    Internal(Internal<I, P>),
+    Internal(View<P, I>),
     External(E),
 }
 
-impl<I, P, E> Location<I, P, E>
+/*
+impl<P, I, E> Location<P, I, E>
 where
-    I: AsRef<Id>,
     P: AsRef<Path>,
+    I: AsRef<Id>,
     E: AsExternal,
 {
     pub fn parse<'input>(input: &'input str) -> Result<Self, InvalidLocation>
@@ -62,15 +63,17 @@ where
         if input.contains("://") {
             Ok(Self::External(E::try_from(input)?))
         } else {
-            Ok(Self::Internal(Internal::try_from(input)?))
+            Ok(Self::Internal(View::try_from(input)?))
         }
     }
 }
+*/
 
-impl<'input, I, P, E> TryFrom<&'input str> for Location<I, P, E>
+/*
+impl<'input, P, I, E> TryFrom<&'input str> for Location<P, I, E>
 where
-    I: AsRef<Id> + TryFrom<&'input str, Error = InvalidId>,
     P: AsRef<Path> + TryFrom<&'input str, Error = InvalidPath>,
+    I: AsRef<Id> + TryFrom<&'input str, Error = InvalidId>,
     E: AsExternal + TryFrom<&'input str, Error = InvalidExternal>,
 {
     type Error = InvalidLocation;
@@ -79,3 +82,4 @@ where
         Self::parse(input)
     }
 }
+*/

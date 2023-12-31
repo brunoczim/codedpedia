@@ -104,6 +104,18 @@ impl AsRef<Self> for Component {
     }
 }
 
+impl AsRef<str> for Component {
+    fn as_ref(&self) -> &str {
+        self.raw_contents()
+    }
+}
+
+impl fmt::Display for Component {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::Component;

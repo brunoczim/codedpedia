@@ -92,6 +92,18 @@ impl AsRef<Self> for Id {
     }
 }
 
+impl AsRef<str> for Id {
+    fn as_ref(&self) -> &str {
+        self.raw_contents()
+    }
+}
+
+impl fmt::Display for Id {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::Id;

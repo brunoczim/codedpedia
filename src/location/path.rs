@@ -117,6 +117,18 @@ impl AsRef<Self> for Path {
     }
 }
 
+impl AsRef<str> for Path {
+    fn as_ref(&self) -> &str {
+        self.raw_contents()
+    }
+}
+
+impl fmt::Display for Path {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmtr, "{}", self.raw_contents())
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Components<'path> {
     inner: str::Split<'path, char>,
@@ -170,11 +182,6 @@ impl PathBuf {
         self.contents.push_str(component.raw_contents());
     }
 
-    pub fn push_str(&mut self, component_str: &str) {
-        self.try_push_str(component_str)
-            .expect("could not make a path component of a string")
-    }
-
     pub fn try_push_str(
         &mut self,
         component_str: &str,
@@ -196,9 +203,15 @@ impl PathBuf {
         Ok(self)
     }
 
-    pub fn append_str(mut self, component_str: &str) -> Self {
-        self.push_str(component_str);
-        self
+    pub fn append_str(self, component_str: &str) -> Self {
+        self.try_append_str(component_str)
+            .expect("attempt to append invalid component in path")
+    }
+}
+
+impl Default for PathBuf {
+    fn default() -> Self {
+        Self::ROOT
     }
 }
 
@@ -217,6 +230,18 @@ impl AsRef<Self> for PathBuf {
 impl AsRef<Path> for PathBuf {
     fn as_ref(&self) -> &Path {
         self.as_path()
+    }
+}
+
+impl AsRef<str> for PathBuf {
+    fn as_ref(&self) -> &str {
+        self.raw_contents()
+    }
+}
+
+impl fmt::Display for PathBuf {
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmtr, "{}", self.raw_contents())
     }
 }
 
