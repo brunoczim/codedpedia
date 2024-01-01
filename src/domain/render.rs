@@ -1,4 +1,8 @@
-use std::{fmt, rc::Rc, sync::Arc};
+use std::{
+    fmt,
+    rc::Rc,
+    sync::{Arc, Mutex},
+};
 
 use crate::location;
 
@@ -358,5 +362,44 @@ where
 
     pub fn kind(self) -> &'kind K {
         self.kind
+    }
+}
+
+#[derive(Debug)]
+pub struct RenderAsDisplay<'loc, 'kind, 'format, C, W>
+where
+    C: Render<W>,
+    W: Format + ?Sized,
+{
+    component: C,
+    format: Mutex<&'format mut W>,
+    context: Context<'loc, 'kind, C::Kind>,
+}
+
+impl<'loc, 'kind, 'format, C, W> RenderAsDisplay<'loc, 'kind, 'format, C, W>
+where
+    C: Render<W>,
+    W: Format + ?Sized,
+{
+    pub fn new(
+        component: C,
+        format: &'format mut W,
+        context: Context<'loc, 'kind, C::Kind>,
+    ) -> Self {
+        Self { component, format: Mutex::new(format), context }
+    }
+}
+
+impl<'loc, 'kind, 'format, C, W> fmt::Display
+    for RenderAsDisplay<'loc, 'kind, 'format, C, W>
+where
+    C: Render<W>,
+    W: Format + ?Sized,
+{
+    fn fmt(&self, fmtr: &mut fmt::Formatter) -> fmt::Result {
+        let mut format = self.format.lock().unwrap();
+        self.component
+            .render(&mut Renderer::new(&mut **format, fmtr), self.context)?;
+        Ok(())
     }
 }

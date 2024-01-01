@@ -79,6 +79,16 @@ impl Location {
         &self.contents
     }
 
+    pub fn view(&self) -> ViewRef {
+        if self.raw_contents().contains("://") {
+            let external = External::from_ref_unchecked(self.raw_contents());
+            ViewRef::External(external)
+        } else {
+            let internal = Internal::from_ref_unchecked(self.raw_contents());
+            ViewRef::Internal(internal)
+        }
+    }
+
     pub(crate) const fn from_ref_unchecked(input: &str) -> &Self {
         unsafe { mem::transmute(input) }
     }
@@ -90,6 +100,18 @@ impl Location {
     #[allow(dead_code)]
     pub(crate) fn into_boxed_contents(self: Box<Self>) -> Box<str> {
         unsafe { mem::transmute(self) }
+    }
+}
+
+impl<'a> Default for &'a Location {
+    fn default() -> Self {
+        Self::from(Path::ROOT)
+    }
+}
+
+impl Default for Box<Location> {
+    fn default() -> Self {
+        Self::from(Path::ROOT.to_boxed())
     }
 }
 
@@ -178,6 +200,30 @@ impl TryFrom<Box<str>> for Box<Location> {
 impl AsRef<Location> for Location {
     fn as_ref(&self) -> &Location {
         self
+    }
+}
+
+impl AsRef<Location> for Component {
+    fn as_ref(&self) -> &Location {
+        Location::from_ref_unchecked(self.raw_contents())
+    }
+}
+
+impl AsRef<Location> for Path {
+    fn as_ref(&self) -> &Location {
+        Location::from_ref_unchecked(self.raw_contents())
+    }
+}
+
+impl AsRef<Location> for Internal {
+    fn as_ref(&self) -> &Location {
+        Location::from_ref_unchecked(self.raw_contents())
+    }
+}
+
+impl AsRef<Location> for External {
+    fn as_ref(&self) -> &Location {
+        Location::from_ref_unchecked(self.raw_contents())
     }
 }
 

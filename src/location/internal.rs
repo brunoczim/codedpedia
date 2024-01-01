@@ -122,6 +122,18 @@ impl Internal {
     }
 }
 
+impl<'a> Default for &'a Internal {
+    fn default() -> Self {
+        Self::from(Path::ROOT)
+    }
+}
+
+impl Default for Box<Internal> {
+    fn default() -> Self {
+        Self::from(Path::ROOT.to_boxed())
+    }
+}
+
 impl<'a> From<&'a Component> for &'a Internal {
     fn from(component: &'a Component) -> Self {
         Self::from(<&Path>::from(component))
@@ -183,6 +195,18 @@ impl TryFrom<Box<str>> for Box<Internal> {
 impl AsRef<Self> for Internal {
     fn as_ref(&self) -> &Self {
         self
+    }
+}
+
+impl AsRef<Internal> for Component {
+    fn as_ref(&self) -> &Internal {
+        Internal::from_ref_unchecked(self.raw_contents())
+    }
+}
+
+impl AsRef<Internal> for Path {
+    fn as_ref(&self) -> &Internal {
+        Internal::from_ref_unchecked(self.raw_contents())
     }
 }
 

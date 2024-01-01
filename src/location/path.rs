@@ -94,6 +94,18 @@ impl Path {
     }
 }
 
+impl<'a> Default for &'a Path {
+    fn default() -> Self {
+        Path::ROOT
+    }
+}
+
+impl Default for Box<Path> {
+    fn default() -> Self {
+        Path::ROOT.to_boxed()
+    }
+}
+
 impl<'a> From<&'a Component> for &'a Path {
     fn from(component: &'a Component) -> Self {
         Path::from_ref_unchecked(component.raw_contents())
@@ -152,6 +164,12 @@ impl<'path> IntoIterator for &'path Path {
 impl AsRef<Self> for Path {
     fn as_ref(&self) -> &Self {
         self
+    }
+}
+
+impl AsRef<Path> for Component {
+    fn as_ref(&self) -> &Path {
+        Path::from_ref_unchecked(self.raw_contents())
     }
 }
 

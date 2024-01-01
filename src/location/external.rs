@@ -4,6 +4,7 @@ use std::{error::Error, fmt, mem};
 pub enum InvalidExternal {
     MissingScheme,
     EmptyScheme,
+    EmptyOther,
     InvalidSchemeStart(char),
     InvalidSchemeChar(char),
 }
@@ -16,6 +17,13 @@ impl fmt::Display for InvalidExternal {
             },
             Self::EmptyScheme => {
                 write!(fmtr, "external location scheme cannot be empty")
+            },
+            Self::EmptyOther => {
+                write!(
+                    fmtr,
+                    "external location with 'other://' scheme must have \
+                     something after it"
+                )
             },
             Self::InvalidSchemeStart(ch) => write!(
                 fmtr,
@@ -55,6 +63,9 @@ pub fn parse<'a>(
     let external_loc = External::from_ref_unchecked(input);
 
     let view = if scheme == "other" {
+        if rest.trim().is_empty() {
+            Err(InvalidExternal::EmptyOther)?;
+        }
         ViewRef::Other(rest)
     } else {
         ViewRef::WithHost { scheme, rest }
