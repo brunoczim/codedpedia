@@ -1,11 +1,6 @@
 //! This module exports list related components.
 
 use super::BlockComponent;
-use crate::{
-    component::Component,
-    hseq::IntoIterRef,
-    render::{markdown, text, Context, Html, Markdown, Render, Renderer, Text},
-};
 use std::{
     cmp::Ordering,
     fmt::{self, Write},
@@ -19,10 +14,7 @@ use std::{
 ///
 /// - `pedia-unord-list` attached to an `<ul>` element.
 /// - `pedia-list-elem` attached to `<li>` elements.
-pub struct UnorderedList<L>(pub L)
-where
-    L: IntoIterRef,
-    <L as IntoIterRef>::Item: Component<Kind = BlockComponent>;
+pub struct UnorderedList<T, V> {}
 
 impl<L> fmt::Debug for UnorderedList<L>
 where
@@ -134,7 +126,7 @@ where
     fn render(
         &self,
         renderer: &mut Renderer<Html>,
-        ctx: Context<Self::Kind>,
+        ctx: render::Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<ul class=\"pedia-unord-list\">")?;
         for element in self.0.iter() {
@@ -155,7 +147,7 @@ where
     fn render(
         &self,
         renderer: &mut Renderer<Markdown>,
-        ctx: Context<Self::Kind>,
+        ctx: render::Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.scoped(markdown::Nest, |renderer| {
             for element in self.0.iter() {
@@ -176,7 +168,7 @@ where
     fn render(
         &self,
         renderer: &mut Renderer<Text>,
-        ctx: Context<Self::Kind>,
+        ctx: render::Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.scoped(text::Nest, |renderer| {
             for element in self.0.iter() {
@@ -312,7 +304,7 @@ where
     fn render(
         &self,
         renderer: &mut Renderer<Html>,
-        ctx: Context<Self::Kind>,
+        ctx: render::Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<ol class=\"pedia-ord-list\">")?;
         for element in self.0.iter() {
@@ -333,7 +325,7 @@ where
     fn render(
         &self,
         renderer: &mut Renderer<Markdown>,
-        ctx: Context<Self::Kind>,
+        ctx: render::Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.scoped(markdown::Nest, |renderer| {
             for element in self.0.iter() {
@@ -354,7 +346,7 @@ where
     fn render(
         &self,
         renderer: &mut Renderer<Text>,
-        ctx: Context<Self::Kind>,
+        ctx: render::Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.scoped(text::Nest, |renderer| {
             for (i, element) in self.0.iter().enumerate() {
@@ -379,7 +371,7 @@ mod test {
         location::InternalPath,
         render::{
             html::test::validate_html_fragment,
-            Context,
+            render::Context,
             Html,
             RenderAsDisplay,
         },
@@ -392,7 +384,7 @@ mod test {
                 (InlineBlock("abc"), Paragraph("def")): BlockComponent
             ]),
             &mut Html::default(),
-            Context::new(&InternalPath::default(), &BlockComponent),
+            render::Context::new(location::Path::ROOT, &BlockComponent),
         )
         .to_string();
 
@@ -406,7 +398,7 @@ mod test {
                 (InlineBlock("abc"), Paragraph("def")): BlockComponent
             ]),
             &mut Html::default(),
-            Context::new(&InternalPath::default(), &BlockComponent),
+            render::Context::new(location::Path::ROOT, &BlockComponent),
         )
         .to_string();
 
