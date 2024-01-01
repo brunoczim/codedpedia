@@ -34,9 +34,9 @@ where
         ctx: render::Context<Self::Kind>,
     ) -> fmt::Result {
         renderer.write_str("<img class=\"pedia-image\" src=\"")?;
-        self.location.render(renderer, ctx.with_kind(&InlineComponent))?;
+        self.location.render(renderer, ctx.with_kind(&LocationComponent))?;
         renderer.write_str("\" alt=\"")?;
-        self.location.render(renderer, ctx.with_kind(&InlineComponent))?;
+        self.alt.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\">")?;
         Ok(())
     }
@@ -54,7 +54,7 @@ where
         renderer.write_str("![")?;
         self.alt.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("](")?;
-        self.location.render(renderer, ctx.with_kind(&InlineComponent))?;
+        self.location.render(renderer, ctx.with_kind(&LocationComponent))?;
         renderer.write_str(")\n\n")?;
         Ok(())
     }
@@ -130,7 +130,7 @@ where
         renderer.write_str("](")?;
         self.image
             .location
-            .render(renderer, ctx.with_kind(&InlineComponent))?;
+            .render(renderer, ctx.with_kind(&LocationComponent))?;
         renderer.write_str(")\n")?;
         self.legend.render(renderer, ctx.with_kind(&InlineComponent))?;
         renderer.write_str("\n")?;
@@ -159,7 +159,7 @@ where
 #[cfg(test)]
 mod test {
     use crate::{
-        component::block::{text::Bold, BlockComponent},
+        component::{block::BlockComponent, inline::text::Bold},
         domain::render::{self, RenderAsDisplay},
         format::{html::test::validate_html_fragment, Html},
         location,
@@ -188,7 +188,7 @@ mod test {
             Figure {
                 image: Image {
                     location: location::Path::new("haha/scream.png").unwrap(),
-                    alt: String::from("imaaage"),
+                    alt: String::from("image"),
                 },
                 legend: Bold("stark image"),
             },

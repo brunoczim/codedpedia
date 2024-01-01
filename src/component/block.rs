@@ -16,8 +16,8 @@ use super::InlineComponent;
 
 pub mod text;
 pub mod media;
-/*
 pub mod list;
+/*
 pub mod table;
 */
 
